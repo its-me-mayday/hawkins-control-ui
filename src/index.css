@@ -245,3 +245,9 @@ body{
   100% { transform: translate(0,0) skewX(0deg); filter: hue-rotate(0deg) contrast(1); }
 }
 .hk-img-glitch { animation: hk-img-glitch .35s steps(6, end); }
+
+.hk-btn--compact{ padding:.42rem .7rem; letter-spacing:.14em; }
+.hk-btn--compact svg{ width:.9rem; height:.9rem; }
+
+.hk-icon img{ filter: drop-shadow(0 0 8px rgba(255,17,51,.25)); transition: filter .15s ease; }
+.hk-icon:hover img{ filter: drop-shadow(0 0 14px rgba(255,17,51,.45)); }

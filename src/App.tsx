@@ -5,9 +5,12 @@ import BattleView from "./sections/BattleView";
 import StrangerCard from "./components/StrangerCard";
 import ControlsBar from "./components/ControlsBar";
 import NewRoundBar from "./components/NewRoundBar";
-import { ART } from "./assets/art";
+import { ART, UI_ART } from "./assets/art";
 import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import { useGameController } from "./hooks/useGameController";
+import IconButton from "./components/IconButton";
+import SettingsDialog from "./components/SettingsDialog";
+import { useState } from "react";
 
 export default function App() {
   const {
@@ -24,13 +27,27 @@ export default function App() {
     },
     actions: { setTargetWins, onPick, nextRound, resetMatch },
   } = useGameController();
-
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
-      <header className="text-center mb-8">
-        <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
-      </header>
+<header className="text-center mb-8 relative">
+  <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
+  <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+
+  <div className="absolute right-0 top-0">
+  <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
+  <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-10 h-10 md:w-20 md:h-20" />
+  </IconButton>
+  </div>
+
+  <SettingsDialog
+    open={settingsOpen}
+    targetWins={targetWins}
+    onChangeTarget={setTargetWins}
+    onClose={() => setSettingsOpen(false)}
+  />
+</header>
 
       <GameArea
         variant="enemy"
@@ -59,6 +76,7 @@ export default function App() {
           disabledSelect={matchOver || awaitNextRound}
           onChangeTarget={setTargetWins}
           onResetMatch={resetMatch}
+          showTarget={false}
         />
 
         {winnerText && (

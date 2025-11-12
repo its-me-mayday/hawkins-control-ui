@@ -8,6 +8,11 @@ import elevenlose from "./eleven-lose.png";
 import demogorgonlose from "./demogorgon-lose.png";
 import lablose from "./hawkins-lab-lose.png"
 import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
+import gear from "./gear.png";
+
+export const UI_ART = {
+  GEAR: { src: gear, alt: "Settings" },
+};
 
 export const ART: Record<
   HawkinsSymbol,
