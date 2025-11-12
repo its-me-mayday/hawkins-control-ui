@@ -32,78 +32,75 @@ export default function SettingsDialog({
   return (
     <dialog
       ref={ref}
-      className="rounded-2xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
-                 backdrop:bg-black/60 p-0 w-[min(92vw,420px)]"
+      className="rounded-xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
+                 backdrop:bg-black/60 p-0 w-[min(92vw,360px)]"
       onClose={onClose}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
       }}
     >
-      <div className="p-4 sm:p-5 space-y-5">
-        <h3 className="hk-title text-sm tracking-[.28em]">SETTINGS</h3>
+      <div className="p-3 sm:p-4 space-y-3">
+        <h3 className="hk-title text-xs tracking-[.28em]">SETTINGS</h3>
 
-        <div className="hk-card flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-(--hawkins-muted)">Music</div>
-            <div className="text-[13px] opacity-80">80s ambience background</div>
-          </div>
-          <label className="inline-flex items-center gap-2 cursor-pointer">
+        <div className="hk-card px-3 py-2 flex items-center justify-between">
+          <div className="text-[11px] uppercase tracking-widest font-semibold hk-title">Music</div>
+          <label className="inline-flex items-center gap-2 cursor-pointer" aria-label="Toggle music">
             <input
               type="checkbox"
               className="sr-only"
               checked={musicOn}
               onChange={(e) => onToggleMusic(e.target.checked)}
             />
-            <span className={`w-11 h-6 rounded-full transition ${musicOn ? "bg-(--hawkins-red)" : "bg-white/20"}`}>
+            <span className={`w-9 h-5 rounded-full transition ${musicOn ? "bg-(--hawkins-red)" : "bg-white/20"}`}>
               <span
-                className={`block w-5 h-5 bg-white rounded-full transition translate-y-[2px] ${
-                  musicOn ? "translate-x-[22px]" : "translate-x-[2px]"
+                className={`block w-4 h-4 bg-white rounded-full transition translate-y-[2px] ${
+                  musicOn ? "translate-x-[18px]" : "translate-x-[2px]"
                 }`}
               />
             </span>
           </label>
         </div>
 
-        <div className="hk-card">
-          <div className="flex items-center justify-between">
-            <div className="text-xs uppercase tracking-widest text-(--hawkins-muted)">Music Volume</div>
-            <div className="text-[12px] opacity-80">{Math.round(musicVolume * 100)}%</div>
+        {musicOn && (
+          <div className="hk-card px-3 py-2">
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] uppercase tracking-widest font-semibold hk-title">Volume</div>
+              <div className="text-[11px] opacity-80 font-semibold hk-title">{Math.round(musicVolume * 100)}%</div>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(musicVolume * 100)}
+              onChange={(e) => onChangeMusicVolume(Number(e.target.value) / 100)}
+              className="w-full mt-1.5"
+              aria-label="Music volume"
+            />
           </div>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={Math.round(musicVolume * 100)}
-            onChange={(e) => onChangeMusicVolume(Number(e.target.value) / 100)}
-            className="w-full mt-2"
-          />
-        </div>
+        )}
 
-        <div className="hk-card flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-(--hawkins-muted)">SFX</div>
-            <div className="text-[13px] opacity-80">pick / win / lose / draw</div>
-          </div>
-          <label className="inline-flex items-center gap-2 cursor-pointer">
+        <div className="hk-card px-3 py-2 flex items-center justify-between">
+          <div className="text-[11px] uppercase tracking-widest font-semibold hk-title">SFX</div>
+          <label className="inline-flex items-center gap-2 cursor-pointer" aria-label="Toggle SFX">
             <input
               type="checkbox"
               className="sr-only"
               checked={sfxOn}
               onChange={(e) => onToggleSfx(e.target.checked)}
             />
-            <span className={`w-11 h-6 rounded-full transition ${sfxOn ? "bg-(--hawkins-red)" : "bg-white/20"}`}>
+            <span className={`w-9 h-5 rounded-full transition ${sfxOn ? "bg-(--hawkins-red)" : "bg-white/20"}`}>
               <span
-                className={`block w-5 h-5 bg-white rounded-full transition translate-y-[2px] ${
-                  sfxOn ? "translate-x-[22px]" : "translate-x-[2px]"
+                className={`block w-4 h-4 bg-white rounded-full transition translate-y-[2px] ${
+                  sfxOn ? "translate-x-[18px]" : "translate-x-[2px]"
                 }`}
               />
             </span>
           </label>
         </div>
 
-        <div className="flex justify-end">
-          <button onClick={onClose} className="hk-btn hk-btn--muted">
+        <div className="flex justify-end pt-1">
+          <button onClick={onClose} className="hk-btn hk-btn--muted text-sm px-3 py-1.5">
             Close
           </button>
         </div>
