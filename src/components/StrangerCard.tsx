@@ -60,7 +60,7 @@ export default function StrangerCard({
       className={[
         "hk-card w-full text-left transition-all overflow-hidden",
         "focus:outline-none",
-        selected ? "ring-2 ring-[var(--hawkins-red)] ring-offset-0" : "",
+        selected ? "ring-2 ring-(--hawkins-red) ring-offset-0" : "",
         outcomeAnim,
         className,
       ].join(" ")}
@@ -84,7 +84,7 @@ export default function StrangerCard({
             style={{ objectPosition: imagePosition }}
           />
         ) : (
-          <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">No image</div>
+          <div className="h-full w-full grid place-items-center text-(--hawkins-muted)">No image</div>
         )}
         {imageFit === "contain" && (
           <>

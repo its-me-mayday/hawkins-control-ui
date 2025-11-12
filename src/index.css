@@ -272,3 +272,18 @@ body{
 .hk-fold { overflow: hidden; transition: max-height .35s ease, opacity .2s ease; }
 .hk-fold--open { max-height: 1000px; opacity: 1; }
 .hk-fold--collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+
+@keyframes hk-portal-pop {
+  0%   { transform: scale(.88); filter: blur(6px) brightness(1.1); box-shadow: 0 0 0 rgba(53,192,255,0); }
+  35%  { transform: scale(1.06); filter: blur(2px) brightness(1.35); box-shadow: 0 0 28px rgba(53,192,255,.35), 0 0 18px rgba(161,0,59,.25) inset; }
+  100% { transform: scale(1);    filter: blur(0)   brightness(1);    box-shadow: 0 0 0 rgba(53,192,255,0); }
+}
+.hk-portal { position: relative; animation: hk-portal-pop .38s ease-out both; }
+.hk-portal::before {
+  content:""; position:absolute; inset:-2px; pointer-events:none; border-radius:18px;
+  background:
+    radial-gradient(60% 50% at 50% 40%, rgba(53,192,255,.20), transparent 60%),
+    radial-gradient(50% 40% at 50% 60%, rgba(161,0,59,.18), transparent 62%);
+  mix-blend-mode: screen; opacity:.85; filter: blur(8px);
+  animation: hk-portal-pop .38s ease-out both;
+}

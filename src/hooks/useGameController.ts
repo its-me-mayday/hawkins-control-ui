@@ -10,6 +10,7 @@ import {
 } from "@its-me-mayday/hawkins-control";
 
 const STORAGE_KEY = "hawkins-control:v1";
+
 type MatchScore = { player: number; enemy: number };
 
 export function useGameController() {
@@ -23,6 +24,7 @@ export function useGameController() {
   const [awaitNextRound, setAwaitNextRound] = useState(false);
   const [enemyThinking, setEnemyThinking] = useState(false);
   const [enemyProgress, setEnemyProgress] = useState(0);
+  const [enemyRevealAt, setEnemyRevealAt] = useState<number | null>(null);
 
   const thinkTimerRef = useRef<number | null>(null);
   const progressTimerRef = useRef<number | null>(null);
@@ -33,17 +35,20 @@ export function useGameController() {
 
   useEffect(() => {
     const payload = { targetWins, match, scoreboard };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {}
   }, [targetWins, match, scoreboard]);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (parsed?.targetWins) setTargetWins(parsed.targetWins);
-      if (parsed?.match) setMatch(parsed.match);
-      if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.targetWins) setTargetWins(parsed.targetWins);
+        if (parsed?.match) setMatch(parsed.match);
+        if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
+      }
     } catch {}
   }, []);
 
@@ -61,6 +66,7 @@ export function useGameController() {
     setLastRound(null);
     setEnemyThinking(false);
     setEnemyProgress(0);
+    setEnemyRevealAt(null);
   };
 
   const resetMatch = () => {
@@ -77,6 +83,7 @@ export function useGameController() {
     if (matchOver || awaitNextRound || enemyThinking) return;
 
     setPlayerChoice(choice);
+
     const totalMs = Math.floor(Math.random() * 5001);
     setEnemyThinking(true);
     setEnemyProgress(0);
@@ -95,6 +102,7 @@ export function useGameController() {
     thinkTimerRef.current = window.setTimeout(() => {
       const enemy = getRandomSymbol();
       setEnemyChoice(enemy);
+      setEnemyRevealAt(Date.now());
       setEnemyThinking(false);
       setEnemyProgress(100);
 
@@ -112,7 +120,9 @@ export function useGameController() {
 
       roundUnlockRef.current = window.setTimeout(() => {
         setAwaitNextRound(false);
-        if (!matchOver) resetRound();
+        if (!matchOver) {
+          resetRound();
+        }
       }, 3000);
     }, totalMs);
   };
@@ -130,7 +140,13 @@ export function useGameController() {
       winnerText,
       enemyThinking,
       enemyProgress,
+      enemyRevealAt,
     },
-    actions: { setTargetWins, onPick, nextRound: () => {}, resetMatch },
+    actions: {
+      setTargetWins,
+      onPick,
+      nextRound: () => {},
+      resetMatch,
+    },
   };
 }
