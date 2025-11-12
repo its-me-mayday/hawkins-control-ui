@@ -26,7 +26,7 @@ export default function App() {
       matchOver,
       winnerText,
     },
-    actions: { setTargetWins, onPick, nextRound, resetMatch },
+    actions: { setTargetWins, onPick, resetMatch },
   } = useGameController();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -44,7 +44,7 @@ export default function App() {
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
 
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
@@ -148,7 +148,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-3 text-xs text-[color:var(--hawkins-muted)] uppercase tracking-widest">
+            <div className="mt-3 text-xs text-(--hawkins-muted) uppercase tracking-widest">
               Match: You {match.player} — {match.enemy} Enemy
             </div>
           </GameArea>
