@@ -8,14 +8,16 @@ type StrangerCardProps = {
   outcomeForSelected?: Outcome | null;
   onSelect?: () => void;
   imageSrc?: string;
-  imageWinSrc?: string,
-  imageLoseSrc?: string,
+  imageWinSrc?: string;
+  imageLoseSrc?: string;
   imageAlt?: string;
   imageFit?: "cover" | "contain";
   imagePosition?: string;
   aspect?: string;
   useWinImage?: boolean;
   useLoseImage?: boolean;
+  className?: string;
+  titleSize?: "sm" | "md";
 };
 
 const ACCENT_BY_SYMBOL: Record<HawkinsSymbol, string> = {
@@ -38,6 +40,8 @@ export default function StrangerCard({
   aspect = "4/3",
   useWinImage = false,
   useLoseImage = false,
+  className = "",
+  titleSize = "md",
 }: StrangerCardProps) {
   const accent = ACCENT_BY_SYMBOL[label];
 
@@ -51,17 +55,24 @@ export default function StrangerCard({
       : "";
 
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
-  const effectiveSrc = useWinImage && imageWinSrc ? imageWinSrc : useLoseImage && imageLoseSrc ? imageLoseSrc : imageSrc;
+  const effectiveSrc =
+    useWinImage && imageWinSrc
+      ? imageWinSrc
+      : useLoseImage && imageLoseSrc
+      ? imageLoseSrc
+      : imageSrc;
+
   const loseTone = selected && outcomeForSelected === "ENEMY" ? "saturate-[.85]" : "";
-  
+
   return (
     <button
       onClick={onSelect}
       className={[
         "hk-card w-full text-left transition-all overflow-hidden",
         "focus:outline-none",
-        selected ? "ring-2 ring-(--hawkins-red) ring-offset-0" : "",
+        selected ? "ring-2 ring-[var(--hawkins-red)] ring-offset-0" : "",
         outcomeAnim,
+        className,
       ].join(" ")}
       style={{
         borderColor: `${accent}55`,
@@ -84,16 +95,15 @@ export default function StrangerCard({
               "h-full w-full transition-transform duration-200 will-change-transform",
               imageFit === "contain" ? "object-contain" : "object-cover",
               imgGlitch,
-              loseTone
+              loseTone,
             ].join(" ")}
             style={{ objectPosition: imagePosition }}
           />
         ) : (
-          <div className="h-full w-full grid place-items-center text-(--hawkins-muted)">
+          <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">
             No image
           </div>
         )}
-
         {imageFit === "contain" && (
           <>
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.12),transparent_30%,transparent_70%,rgba(0,0,0,.18))]" />
@@ -106,7 +116,10 @@ export default function StrangerCard({
       </div>
 
       <div className="mt-3 text-center uppercase tracking-widest">
-        <span className="text-sm sm:text-base" style={{ color: accent }}>
+        <span
+          className={titleSize === "sm" ? "text-xs sm:text-sm" : "text-sm sm:text-base"}
+          style={{ color: accent }}
+        >
           {label.replace("_", " ")}
         </span>
       </div>

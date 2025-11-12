@@ -1,3 +1,4 @@
+// src/App.tsx
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import EnemyView from "./sections/EnemyView";
@@ -29,7 +30,7 @@ export default function App() {
       enemyThinking,
       enemyProgress,
     },
-    actions: { setTargetWins, onPick, resetMatch },
+    actions: { setTargetWins, onPick, nextRound, resetMatch },
   } = useGameController();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -47,7 +48,7 @@ export default function App() {
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+        <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
 
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
@@ -142,32 +143,36 @@ export default function App() {
               )}
 
               <div
-                className={`grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 ${
+                className={`grid grid-cols-3 gap-5 mt-2 ${
                   disablePlay ? "opacity-60 pointer-events-none" : ""
                 }`}
               >
                 {HAWKINS_SYMBOLS.map((symbol: HawkinsSymbol) => (
-                  <StrangerCard
-                    key={symbol}
-                    label={symbol}
-                    selected={playerChoice === symbol}
-                    outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
-                    imageSrc={ART[symbol].src}
-                    imageWinSrc={ART[symbol].win}
-                    imageLoseSrc={ART[symbol].lose}
-                    imageAlt={ART[symbol].alt}
-                    imageFit={ART[symbol].fit}
-                    imagePosition={ART[symbol].pos}
-                    useWinImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"}
-                    useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
-                    aspect={ART[symbol].aspect}
-                    onSelect={() => onPick(symbol)}
-                  />
+                  <div key={symbol} className="flex justify-center">
+                    <StrangerCard
+                      label={symbol}
+                      selected={playerChoice === symbol}
+                      outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
+                      imageSrc={ART[symbol].src}
+                      imageWinSrc={ART[symbol].win}
+                      imageLoseSrc={ART[symbol].lose}
+                      imageAlt={ART[symbol].alt}
+                      imageFit={ART[symbol].fit}
+                      imagePosition={ART[symbol].pos}
+                      useWinImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"}
+                      useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
+                      aspect={ART[symbol].aspect}
+                      onSelect={() => onPick(symbol)}
+                      className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
+                      titleSize="sm"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
           </GameArea>
         </div>
+
         <div className="space-y-6 mt-6 lg:mt-0">
           <MatchSetupPanel
             onStart={startMatch}
