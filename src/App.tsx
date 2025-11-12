@@ -1,5 +1,4 @@
 // src/App.tsx
-import { useSynth } from "./hooks/useSynth";
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import BattleView from "./sections/BattleView";
@@ -15,6 +14,7 @@ import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import { useEffect, useState } from "react";
+import { useSynth } from "./hooks/useSynth";
 
 export default function App() {
   const {
@@ -36,33 +36,37 @@ export default function App() {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [started, setStarted] = useState(false);
+
+  // NEW: Battle visibile solo dopo la prima scelta
+  const [battleShown, setBattleShown] = useState(false);
+
+  // Synth (audio)
   const synth = useSynth();
 
   const startMatch = (rounds: number) => {
-    synth.arm(); 
+    synth.arm();
     resetMatch();
     setTargetWins(rounds);
     setStarted(true);
+    setBattleShown(false); // nascondi Battle finché non scegli la prima carta
   };
-  
+
+  const disablePlay = !started || awaitNextRound || matchOver;
+  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver);
+
   useEffect(() => {
-    if (playerChoice && !matchOver) synth.select();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerChoice]);
-  
+    if (started && !matchOver && !playerChoice && !enemyChoice) {
+      setBattleShown(false);
+    }
+  }, [started, matchOver, playerChoice, enemyChoice]);
+
   useEffect(() => {
     const out = lastRound?.outcome;
     if (!out) return;
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastRound?.outcome]);
-
-  const disablePlay = !started || awaitNextRound || matchOver;
-
-  // Fold: chiudi Player quando sta “pensando” il nemico o quando celebri l’esito
-  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver);
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
@@ -90,7 +94,7 @@ export default function App() {
       </header>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6 items-start">
-        {/* COLONNA SINISTRA — Player PRIMA, poi Battle */}
+        {/* COLONNA SINISTRA — Player PRIMA, poi (se mostrata) Battle */}
         <div className="space-y-6 min-w-0">
           {/* PLAYER (foldabile) */}
           <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
@@ -116,7 +120,10 @@ export default function App() {
                         useWinImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"}
                         useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
                         aspect={ART[symbol].aspect}
-                        onSelect={() => onPick(symbol)}
+                        onSelect={() => {
+                          if (!battleShown) setBattleShown(true); // mostra solo durante questo round
+                          onPick(symbol);
+                        }}
                         className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
                         titleSize="sm"
                       />
@@ -127,44 +134,46 @@ export default function App() {
             </GameArea>
           </div>
 
-          {/* BATTLE */}
-          <GameArea
-            variant="battle"
-            title="Battle"
-            subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
-            className={
-              lastRound?.outcome === "PLAYER"
-                ? "animate-hk-win"
-                : lastRound?.outcome === "ENEMY"
-                ? "animate-hk-lose"
-                : lastRound?.outcome === "DRAW"
-                ? "animate-hk-draw"
-                : ""
-            }
-          >
-            <ControlsBar
-              targetWins={targetWins}
-              disabledSelect={true}
-              onChangeTarget={setTargetWins}
-              showTarget={false}
-            />
-
-            <BattleDuel
-              player={started ? playerChoice : null}
-              enemy={started ? enemyChoice : null}
-              outcome={started ? (lastRound?.outcome ?? null) : null}
-              locked={awaitNextRound}
-              thinking={started && enemyThinking}
-              progress={enemyProgress}
-            />
-
-            <div className="mt-4">
-              <BattleView
-                narration={started ? (lastRound?.narration ?? null) : null}
-                result={started ? (lastRound?.outcome ?? null) : null}
+          {/* BATTLE — visibile solo dopo la prima scelta */}
+          {battleShown && (
+            <GameArea
+              variant="battle"
+              title="Battle"
+              subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
+              className={
+                lastRound?.outcome === "PLAYER"
+                  ? "animate-hk-win"
+                  : lastRound?.outcome === "ENEMY"
+                  ? "animate-hk-lose"
+                  : lastRound?.outcome === "DRAW"
+                  ? "animate-hk-draw"
+                  : ""
+              }
+            >
+              <ControlsBar
+                targetWins={targetWins}
+                disabledSelect={true}
+                onChangeTarget={setTargetWins}
+                showTarget={false}
               />
-            </div>
-          </GameArea>
+
+              <BattleDuel
+                player={started ? playerChoice : null}
+                enemy={started ? enemyChoice : null}
+                outcome={started ? (lastRound?.outcome ?? null) : null}
+                locked={awaitNextRound}
+                thinking={started && enemyThinking}
+                progress={enemyProgress}
+              />
+
+              <div className="mt-4">
+                <BattleView
+                  narration={started ? (lastRound?.narration ?? null) : null}
+                  result={started ? (lastRound?.outcome ?? null) : null}
+                />
+              </div>
+            </GameArea>
+          )}
         </div>
 
         {/* COLONNA DESTRA — SOLO stats */}
@@ -179,16 +188,17 @@ export default function App() {
         </div>
       </div>
 
-      {/* Overlay di START */}
+      {/* OVERLAY START */}
       <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
 
-      {/* Overlay di FINE MATCH */}
+      {/* OVERLAY FINE MATCH */}
       <EndOverlay
         open={matchOver}
         winnerText={winnerText}
         onNewMatch={() => {
           resetMatch();
           setStarted(false);
+          setBattleShown(false); // nascondi di nuovo la Battle per il nuovo match
         }}
       />
     </main>
