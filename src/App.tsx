@@ -26,7 +26,7 @@ export default function App() {
       matchOver,
       winnerText,
     },
-    actions: { setTargetWins, onPick, resetMatch },
+    actions: { setTargetWins, onPick, nextRound, resetMatch },
   } = useGameController();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -44,7 +44,7 @@ export default function App() {
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+        <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
 
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
@@ -70,51 +70,56 @@ export default function App() {
           <GameArea
             variant="enemy"
             title="Enemy"
-            subtitle={`Wins ${scoreboard.losses} • Losses ${scoreboard.wins} • Draws ${scoreboard.draws}`}
+            subtitle={started ? "The computer is plotting..." : "Waiting for match to start"}
           >
             <EnemyView choice={started ? (enemyChoice ?? null) : null} />
           </GameArea>
 
           <GameArea
-            variant="battle"
-            title="Battle"
-            subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
-            className={
-              lastRound?.outcome === "PLAYER"
-                ? "animate-hk-win"
-                : lastRound?.outcome === "ENEMY"
-                ? "animate-hk-lose"
-                : lastRound?.outcome === "DRAW"
-                ? "animate-hk-draw"
-                : ""
-            }
-          >
-            <ControlsBar
-              targetWins={targetWins}
-              disabledSelect={true}
-              onChangeTarget={setTargetWins}
-              onResetMatch={() => {
-                resetMatch();
-                setStarted(false);
-              }}
-              showTarget={false}
-            />
+  variant="battle"
+  title="Battle"
+  subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
+  className={
+    lastRound?.outcome === "PLAYER"
+      ? "animate-hk-win"
+      : lastRound?.outcome === "ENEMY"
+      ? "animate-hk-lose"
+      : lastRound?.outcome === "DRAW"
+      ? "animate-hk-draw"
+      : ""
+  }
+>
+  <ControlsBar
+    targetWins={targetWins}
+    disabledSelect={true}
+    onChangeTarget={setTargetWins}
+    showTarget={false}
+  />
 
-            {winnerText && (
-              <div className="mt-2 text-sm hk-card text-center animate-hk-flash">
-                {winnerText} — press “Reset Match” to play again
-              </div>
-            )}
+  {winnerText ? (
+    <div className="mt-2 hk-card text-center space-y-3 animate-hk-flash">
+      <div className="text-sm">{winnerText}</div>
+      <button
+        className="hk-btn hk-btn--danger"
+        onClick={() => {
+          resetMatch();
+          setStarted(false);
+        }}
+      >
+        New Match
+      </button>
+    </div>
+  ) : null}
 
-            <BattleView
-              narration={started ? (lastRound?.narration ?? null) : null}
-              result={started ? (lastRound?.outcome ?? null) : null}
-            />
-          </GameArea>
+  <BattleView
+    narration={started ? (lastRound?.narration ?? null) : null}
+    result={started ? (lastRound?.outcome ?? null) : null}
+  />
+</GameArea>
 
 
           <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
-            <div className={`relative`}>
+            <div className="relative">
               {!started && (
                 <div className="absolute inset-0 grid place-items-center z-10">
                   <div className="hk-card text-sm text-center">
@@ -122,6 +127,7 @@ export default function App() {
                   </div>
                 </div>
               )}
+
               <div
                 className={`grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 ${
                   disablePlay ? "opacity-60 pointer-events-none" : ""
@@ -147,13 +153,10 @@ export default function App() {
                 ))}
               </div>
             </div>
-
-            <div className="mt-3 text-xs text-(--hawkins-muted) uppercase tracking-widest">
-              Match: You {match.player} — {match.enemy} Enemy
-            </div>
           </GameArea>
         </div>
 
+        {/* COLONNA DESTRA */}
         <div className="space-y-6 mt-6 lg:mt-0">
           <MatchSetupPanel
             onStart={startMatch}
