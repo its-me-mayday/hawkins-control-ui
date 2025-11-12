@@ -1,12 +1,20 @@
+import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
+
 type Outcome = "PLAYER" | "ENEMY" | "DRAW";
 
 type StrangerCardProps = {
-  label: string;                 // es. "ELEVEN"
+  label: HawkinsSymbol;             // usa il tipo della lib
   selected?: boolean;
   outcomeForSelected?: Outcome | null;
   onSelect?: () => void;
-  imageSrc?: string;             // passata da fuori
+  imageSrc?: string;
   imageAlt?: string;
+};
+
+const ACCENT_BY_SYMBOL: Record<HawkinsSymbol, string> = {
+  ELEVEN: "var(--accent-eleven)",
+  DEMOGORGON: "var(--accent-demog)",
+  HAWKINS_LAB: "var(--accent-lab)",
 };
 
 export default function StrangerCard({
@@ -17,6 +25,8 @@ export default function StrangerCard({
   imageSrc,
   imageAlt,
 }: StrangerCardProps) {
+  const accent = ACCENT_BY_SYMBOL[label];
+
   const outcomeAnim =
     selected && outcomeForSelected === "PLAYER"
       ? "animate-card-win"
@@ -25,6 +35,9 @@ export default function StrangerCard({
       : selected && outcomeForSelected === "DRAW"
       ? "animate-card-draw"
       : "";
+
+  // glitch solo se questa card è la selezionata e hai perso
+  const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
 
   return (
     <button
@@ -35,28 +48,46 @@ export default function StrangerCard({
         selected ? "ring-2 ring-[var(--hawkins-red)] ring-offset-0" : "",
         outcomeAnim,
       ].join(" ")}
+      style={{
+        // bordo/ombra del pannello card colorati per-simbolo
+        borderColor: `${accent}55`,
+        boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
+      }}
     >
-      {/* media area */}
+      {/* media */}
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
         {imageSrc ? (
           <img
             src={imageSrc}
             alt={imageAlt || label.replace("_", " ")}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-200 will-change-transform hover:scale-[1.03]"
+            className={[
+              "h-full w-full object-cover transition-transform duration-200 will-change-transform",
+              "hover:scale-[1.03]",
+              imgGlitch,
+            ].join(" ")}
           />
         ) : (
           <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">
             No image
           </div>
         )}
-        {/* overlay leggero */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/20" />
+
+        {/* overlay gradiente per-simbolo */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, ${accent}22 0%, transparent 55%)`,
+          }}
+        />
       </div>
 
       {/* label */}
       <div className="mt-3 text-center uppercase tracking-widest">
-        <span className="text-[color:var(--hawkins-red)] text-sm sm:text-base">
+        <span
+          className="text-sm sm:text-base"
+          style={{ color: accent }}
+        >
           {label.replace("_", " ")}
         </span>
       </div>
