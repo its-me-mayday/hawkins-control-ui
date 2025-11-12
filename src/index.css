@@ -181,3 +181,173 @@ body{
   .animate-card-lose,
   .animate-card-draw { animation: none !important; }
 }
+
+/* Neon buttons */
+.hk-btn{
+  --btn-bg: transparent;
+  --btn-fg: var(--hawkins-ink);
+  --btn-br: rgba(255,17,51,0.35);
+  --btn-shadow: 0 0 18px rgba(255,17,51,0.25);
+  --btn-shadow-hover: 0 0 28px rgba(255,17,51,0.45);
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.55rem .9rem; border-radius:999px;
+  border:1px solid var(--btn-br);
+  color:var(--btn-fg); background:var(--btn-bg);
+  text-transform:uppercase; letter-spacing:.18em; font-weight:600;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  box-shadow: var(--btn-shadow);
+}
+.hk-btn svg{ width:1rem; height:1rem; }
+
+.hk-btn:hover{ transform: translateY(-1px); box-shadow: var(--btn-shadow-hover); }
+
+/* variants */
+.hk-btn--ghost{
+  --btn-fg: var(--hawkins-red);
+  --btn-br: rgba(255,17,51,0.6);
+}
+.hk-btn--ghost:hover{
+  --btn-bg: var(--hawkins-red);
+  --btn-fg: #07080c;
+}
+
+.hk-btn--danger{
+  --btn-fg: #07080c;
+  --btn-bg: var(--hawkins-red);
+  --btn-br: rgba(255,17,51,0.9);
+}
+
+.hk-btn--muted{
+  --btn-fg: var(--hawkins-muted);
+  --btn-br: rgba(152,163,179,0.35);
+}
+.hk-btn--muted:hover{
+  --btn-fg: var(--hawkins-ink);
+  --btn-br: rgba(255,17,51,0.5);
+}
+
+/* disabled */
+.hk-btn[disabled], .hk-btn[aria-disabled="true"]{
+  opacity:.55; pointer-events:none; filter: grayscale(.2);
+}
+
+/* --- Better interactivity for hk-btn --- */
+.hk-btn{
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.hk-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-hover);
+  filter: saturate(110%);
+}
+
+.hk-btn:active{
+  transform: translateY(0) scale(.98);
+  box-shadow: 0 0 12px rgba(255,17,51,.35);
+  filter: brightness(.98);
+}
+
+/* keyboard focus */
+.hk-btn:focus-visible{
+  box-shadow:
+    0 0 0 2px rgba(255,17,51,.65) inset,
+    0 0 0 2px rgba(255,17,51,.45),
+    var(--btn-shadow-hover);
+}
+
+/* variant-specific hover tweaks */
+.hk-btn--ghost:hover{
+  --btn-bg: var(--hawkins-red);
+  --btn-fg: #07080c;
+}
+
+.hk-btn--danger:hover{
+  filter: saturate(115%) brightness(1.03);
+  box-shadow: 0 0 32px rgba(255,17,51,.55);
+}
+
+/* optional: subtle center ripple on press (CSS-only) */
+.hk-btn::after{
+  content:""; position:absolute; inset:0; border-radius:999px;
+  background: radial-gradient(circle at center, rgba(255,255,255,.18), transparent 40%);
+  opacity:0; transform: scale(.6); transition: opacity .15s ease, transform .15s ease;
+  pointer-events:none;
+}
+.hk-btn:active::after{ opacity:.35; transform: scale(1); }
+
+/* cursor-follow ripple for .hk-btn */
+.hk-btn { position: relative; overflow: hidden; }
+.hk-btn::after{
+  content:"";
+  position:absolute; inset:0; pointer-events:none; border-radius:999px;
+  background: radial-gradient(
+    220px 220px at var(--rx, 50%) var(--ry, 50%),
+    rgba(255,255,255,.16),
+    rgba(255,255,255,0) 45%
+  );
+  opacity:0;
+  transition: opacity .12s ease;
+}
+.hk-btn:hover::after{ opacity:.28; }
+.hk-btn:active::after{ opacity:.38; }
+
+.hk-btn { position: relative; overflow: hidden; }
+.hk-btn::after{
+  content:"";
+  position:absolute; inset:0; pointer-events:none; border-radius:100px;
+  background: radial-gradient(
+    500px 500px at var(--rx, 20%) var(--ry, 20%),
+    rgba(255,255,255,.16),
+    rgba(255,255,255,0) 75%
+  );
+  opacity:0; transition: opacity .12s ease;
+}
+.hk-btn:hover::after{ opacity:.58; }
+.hk-btn:active::after{ opacity:.78; }
+
+.ripple-demo {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-demo::after {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; border-radius: 999px;
+  background: radial-gradient(
+    320px 320px at var(--rx, 50%) var(--ry, 50%),
+    rgba(53,192,255,0.50),
+    rgba(53,192,255,0.25) 25%,
+    rgba(53,192,255,0.00) 55%
+  );
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+
+.ripple-demo:hover::after  { opacity: .6; }
+.ripple-demo:active::after { opacity: .85; }
+
+.hk-btn { position:relative; transition:transform .12s, box-shadow .12s, filter .12s; }
+.hk-btn:hover { transform: translateY(-2px); box-shadow: 0 0 28px rgba(255,17,51,.45); filter: saturate(110%); }
+.hk-btn:active { transform: translateY(0) scale(.98); box-shadow: 0 0 14px rgba(255,17,51,.35); }
+.hk-btn:focus-visible { box-shadow: 0 0 0 2px rgba(255,17,51,.6) inset, 0 0 0 2px rgba(255,17,51,.4); }
+
+.hk-btn--shine { position:relative; overflow:hidden; }
+.hk-btn--shine::before{
+  content:""; position:absolute; top:-120%; left:-30%;
+  width:40%; height:300%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: skewX(-20deg) translateX(-120%);
+  transition: transform .45s ease;
+  mix-blend-mode: screen;
+}
+.hk-btn--shine:hover::before{ transform: skewX(-20deg) translateX(220%); }
+
+@keyframes hk-border-pulse {
+  0% { box-shadow: 0 0 0 rgba(255,17,51,0); }
+  50%{ box-shadow: 0 0 28px rgba(255,17,51,.55); }
+  100%{ box-shadow: 0 0 0 rgba(255,17,51,0); }
+}
+.hk-btn--pulse:active { animation: hk-border-pulse .4s ease-out; }

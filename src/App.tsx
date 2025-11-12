@@ -4,7 +4,42 @@ import "./index.css";
 import GameArea from "./sections/GameArea";
 import EnemyView from "./sections/EnemyView";
 import BattleView from "./sections/BattleView";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ART } from "./assets/art";
+
+const STORAGE_KEY = "hawkins-control:v1";
+
+
+function useButtonRipple(selector = ".hk-btn") {
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
+    const onMove = (el: HTMLElement) => (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--rx", `${e.clientX - r.left}px`);
+      el.style.setProperty("--ry", `${e.clientY - r.top}px`);
+    };
+    const onEnter = (el: HTMLElement) => () => el.setPointerCapture?.((event as any)?.pointerId);
+    const onLeave = (el: HTMLElement) => () => {
+      el.style.removeProperty("--rx");
+      el.style.removeProperty("--ry");
+    };
+
+    const binds = els.map((el) => {
+      const m = onMove(el);
+      const leave = onLeave(el);
+      el.addEventListener("pointermove", m);
+      el.addEventListener("pointerleave", leave);
+      return { el, m, leave };
+    });
+
+    return () => {
+      binds.forEach(({ el, m, leave }) => {
+        el.removeEventListener("pointermove", m);
+        el.removeEventListener("pointerleave", leave);
+      });
+    };
+  }, [selector]);
+}
 
 function useSynth() {
   const ctxRef = useRef<AudioContext | null>(null);
@@ -143,13 +178,75 @@ function useSynth() {
 }
 
 export default function App() {
-  const synth = useSynth();
+  useButtonRipple();
   const [playerChoice, setPlayerChoice] = useState<HawkinsSymbol | null>(null);
   const [enemyChoice, setEnemyChoice] = useState<HawkinsSymbol | null>(null);
   const [lastRound, setLastRound] = useState<RoundResult | null>(null);
   const [scoreboard, setScoreboard] = useState<Scoreboard>(createInitialScoreboard());
+  const [targetWins, setTargetWins] = useState<number>(5); // first to N
+  const [match, setMatch] = useState<{ player: number; enemy: number }>({ player: 0, enemy: 0 });
+  
+  
+  const synth = useSynth();
+
+  const matchOver = match.player >= targetWins || match.enemy >= targetWins;
+  const winnerText =
+    match.player >= targetWins ? "YOU WON THE MATCH" :
+    match.enemy >= targetWins ? "ENEMY WON THE MATCH" : null;
+
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.targetWins) setTargetWins(parsed.targetWins);
+      if (parsed?.match) setMatch(parsed.match);
+      if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
+    }
+  } catch {}
+}, []);
+
+useEffect(() => {
+  const payload = { targetWins, match, scoreboard };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
+}, [targetWins, match, scoreboard]);
+
+
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.targetWins) setTargetWins(parsed.targetWins);
+      if (parsed?.match) setMatch(parsed.match);
+      if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
+    }
+  } catch {}
+}, []);
+
+const resetRound = () => {
+  setPlayerChoice(null);
+  setEnemyChoice(null);
+  setLastRound(null);
+};
+
+const resetMatch = () => {
+  resetRound();
+  setMatch({ player: 0, enemy: 0 });
+  setScoreboard(createInitialScoreboard());
+};
+
+
+useEffect(() => {
+  const payload = { targetWins, match, scoreboard };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
+}, [targetWins, match, scoreboard]);
+
   
   const onPick = (choice: HawkinsSymbol) => {
+    if (matchOver) return;
+    synth.select();
+
     requestAnimationFrame(() => {
       const btn = document.activeElement as HTMLElement | null;
       if (btn) { btn.classList.add("animate-hk-press"); setTimeout(() => btn.classList.remove("animate-hk-press"), 160); }
@@ -160,10 +257,17 @@ export default function App() {
     setPlayerChoice(choice);
     const enemy = getRandomSymbol();
     setEnemyChoice(enemy);
+    
     const round = judgeRound(choice, enemy);
     setLastRound(round);
     setScoreboard((prev) => applyRoundToScoreboard(prev, round));
     
+    setMatch((m) => {
+      if (round.outcome === "PLAYER") return { ...m, player: m.player + 1 };
+      if (round.outcome === "ENEMY")  return { ...m, enemy: m.enemy + 1 };
+      return m;
+    });
+     
     if (round.outcome === "PLAYER") synth.win();
     else if (round.outcome === "ENEMY") synth.lose();
     else synth.draw();
@@ -176,7 +280,10 @@ export default function App() {
         <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
       </header>
 
-      <GameArea variant="enemy" title="Enemy" subtitle={`Wins ${scoreboard.losses} • Losses ${scoreboard.wins} • Draws ${scoreboard.draws}`}>
+      <GameArea 
+        variant="enemy" 
+        title="Enemy" 
+        subtitle={`Wins ${scoreboard.losses} • Losses ${scoreboard.wins} • Draws ${scoreboard.draws}`}>
         <EnemyView choice={enemyChoice ?? null} />
       </GameArea>
 
@@ -194,6 +301,42 @@ export default function App() {
           : ""
         }
       >
+<div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+  <div className="text-xs uppercase tracking-widest text-[color:var(--hawkins-muted)]">
+    First to{" "}
+    <select
+      className="bg-transparent border border-[color:var(--hawkins-muted)]/30 rounded px-2 py-1"
+      value={targetWins}
+      onChange={(e) => setTargetWins(Number(e.target.value))}
+      disabled={matchOver}
+    >
+      {[3,5,7,10].map((n) => (
+        <option key={n} value={n}>{n}</option>
+      ))}
+    </select>
+  </div>
+
+  <div className="flex gap-2">
+    <button
+      onClick={resetMatch}
+      className="hk-btn hk-btn--danger hk-btn--shine hk-btn--pulse"
+      title="Reset match and scores"
+    >
+      {/* icon: power */}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 2v10" />
+        <path d="M7.5 4.2A9 9 0 1 0 16.5 4.2" />
+      </svg>
+      Reset Match
+    </button>
+  </div>
+</div>
+
+        {winnerText && (
+          <div className="mt-2 text-sm hk-card text-center animate-hk-flash">
+            {winnerText} — press “Reset Match” to play again
+          </div>
+        )}
         <BattleView
           narration={lastRound?.narration ?? null}
           result={lastRound?.outcome ?? null}
@@ -201,16 +344,21 @@ export default function App() {
       </GameArea>
 
       <GameArea variant="player" title="Player" subtitle="Choose your side">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 p-2">
+      <div className={`grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 ${matchOver ? "opacity-60 pointer-events-none" : ""}`}> 
           {HAWKINS_SYMBOLS.map((symbol) => (
             <StrangerCard 
               key={symbol} 
               label={symbol} 
               selected={playerChoice === symbol}
               outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
+              imageSrc={ART[symbol].src}
+              imageAlt={ART[symbol].alt}
               onSelect={() => onPick(symbol)}
             />
           ))}
+        </div>
+        <div className="mt-3 text-xs text-(--hawkins-muted) uppercase tracking-widest">
+          Match: You {match.player} — {match.enemy} Enemy
         </div>
       </GameArea>
     </main>
