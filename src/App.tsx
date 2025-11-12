@@ -7,49 +7,27 @@ import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-cont
 import { useGameController } from "./hooks/useGameController";
 import IconButton from "./components/IconButton";
 import SettingsDialog from "./components/SettingsDialog";
-import StatsPanel from "./components/StatsPanel";
 import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
+import StatsDialog from "./components/StatsDialog";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
 
 const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
 
-type AudioSettingsV1 = {
-  schemaVersion: 1;
-  musicOn: boolean;
-  sfxOn: boolean;
-  musicVolume: number; // 0..1
-};
-
-function readAudioSettings(): AudioSettingsV1 | null {
+function readAudioSettings() {
   try {
     const raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed?.schemaVersion === 1) return parsed as AudioSettingsV1;
-    }
-    const legMusicOn = localStorage.getItem("hawkins:musicOn");
-    const legSfxOn = localStorage.getItem("hawkins:sfxOn");
-    const legVol = localStorage.getItem("hawkins:musicVolume");
-    if (legMusicOn || legSfxOn || legVol) {
-      return {
-        schemaVersion: 1,
-        musicOn: legMusicOn ? legMusicOn === "true" : false,
-        sfxOn: legSfxOn ? legSfxOn === "true" : true,
-        musicVolume: legVol ? Math.max(0, Math.min(1, Number(legVol))) : 0.12,
-      };
-    }
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.schemaVersion === 1 ? parsed : null;
   } catch {}
   return null;
 }
-
-function writeAudioSettings(s: AudioSettingsV1) {
-  try {
-    localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s));
-  } catch {}
+function writeAudioSettings(s) {
+  try { localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s)); } catch {}
 }
 
 export default function App() {
@@ -71,19 +49,18 @@ export default function App() {
   } = useGameController();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const [started, setStarted] = useState(false);
   const [battleShown, setBattleShown] = useState(false);
 
   const synth = useSynth();
   const ambience = useAmbience();
 
-  const [musicOn, setMusicOn] = useState<boolean>(false);
-  const [sfxOn, setSfxOn] = useState<boolean>(true);
-  const [musicVolume, setMusicVolume] = useState<number>(0.12);
+  const [musicOn, setMusicOn] = useState(false);
+  const [sfxOn, setSfxOn] = useState(true);
+  const [musicVolume, setMusicVolume] = useState(0.12);
 
-  useEffect(() => {
-    ambience.setMode?.("pulse");
-  }, [ambience]);
+  useEffect(() => { ambience.setMode?.("pulse"); }, [ambience]);
 
   useEffect(() => {
     const s = readAudioSettings();
@@ -92,22 +69,12 @@ export default function App() {
     setSfxOn(!!s.sfxOn);
     setMusicVolume(typeof s.musicVolume === "number" ? s.musicVolume : 0.12);
   }, []);
-
-  useEffect(() => {
-    writeAudioSettings({ schemaVersion: 1, musicOn, sfxOn, musicVolume });
-  }, [musicOn, sfxOn, musicVolume]);
-
-  useEffect(() => {
-    ambience.setEnabled(musicOn);
-  }, [musicOn, ambience]);
-
-  useEffect(() => {
-    ambience.setVolume(musicVolume);
-  }, [musicVolume, ambience]);
+  useEffect(() => { writeAudioSettings({ schemaVersion: 1, musicOn, sfxOn, musicVolume }); }, [musicOn, sfxOn, musicVolume]);
+  useEffect(() => { ambience.setEnabled(musicOn); }, [musicOn, ambience]);
+  useEffect(() => { ambience.setVolume(musicVolume); }, [musicVolume, ambience]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
-  const playerFolded =
-    started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
+  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
 
   const battleAnim = useMemo(() => {
     if (lastRound?.outcome === "PLAYER") return "animate-hk-win";
@@ -116,7 +83,7 @@ export default function App() {
     return "";
   }, [lastRound?.outcome]);
 
-  const startMatch = (rounds: number) => {
+  const startMatch = (rounds) => {
     if (musicOn) ambience.arm();
     if (sfxOn) synth.arm();
     resetMatch();
@@ -131,8 +98,7 @@ export default function App() {
 
   useEffect(() => {
     const out = lastRound?.outcome;
-    if (!out) return;
-    if (!sfxOn) return;
+    if (!out || !sfxOn) return;
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
@@ -140,33 +106,53 @@ export default function App() {
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
-      <header className="text-center mb-8 relative pr-16 sm:pr-24">
+      <header className="text-center mb-8 relative pr-28 sm:pr-36">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
         <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
-        <div className="absolute right-0 top-0">
-          <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
-            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-8 h-8 md:w-10 md:h-10" draggable={false} />
+
+        <div className="absolute right-0 top-0 flex items-center gap-2 sm:gap-3">
+          <IconButton
+            label="Open stats"
+            onClick={() => setStatsOpen(true)}
+            className="w-9 h-9 md:w-10 md:h-10"
+            title="Stats"
+          >
+            <img src={UI_ART.STATS.src} alt={UI_ART.STATS.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
+          </IconButton>
+
+          <IconButton
+            label="Open settings"
+            onClick={() => setSettingsOpen(true)}
+            className="w-9 h-9 md:w-10 md:h-10"
+            title="Settings"
+          >
+            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
           </IconButton>
         </div>
+
         <SettingsDialog
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
           musicOn={musicOn}
           sfxOn={sfxOn}
           musicVolume={musicVolume}
-          onToggleMusic={(v) => {
-            setMusicOn(v);
-            if (v) ambience.arm();
-          }}
-          onToggleSfx={(v) => {
-            setSfxOn(v);
-            if (v) synth.arm();
-          }}
+          onToggleMusic={(v) => { setMusicOn(v); if (v) ambience.arm(); }}
+          onToggleSfx={(v) => { setSfxOn(v); if (v) synth.arm(); }}
           onChangeMusicVolume={(v) => setMusicVolume(v)}
+        />
+
+        <StatsDialog
+          open={statsOpen}
+          onClose={() => setStatsOpen(false)}
+          wins={scoreboard.wins}
+          losses={scoreboard.losses}
+          draws={scoreboard.draws}
+          playerScore={match.player}
+          enemyScore={match.enemy}
         />
       </header>
 
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6 items-start">
+      <div className="grid lg:grid-cols-1 items-start">
         <div className="space-y-6 min-w-0">
           <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
             <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
@@ -212,7 +198,12 @@ export default function App() {
               subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
               className={battleAnim}
             >
-              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={setTargetWins} showTarget={false} />
+              <ControlsBar
+                targetWins={targetWins}
+                disabledSelect={true}
+                onChangeTarget={setTargetWins}
+                showTarget={false}
+              />
               <BattleDuel
                 player={started ? playerChoice : null}
                 enemy={started ? enemyChoice : null}
@@ -224,16 +215,6 @@ export default function App() {
               />
             </GameArea>
           )}
-        </div>
-
-        <div className="space-y-6 mt-6 lg:mt-0">
-          <StatsPanel
-            wins={scoreboard.wins}
-            losses={scoreboard.losses}
-            draws={scoreboard.draws}
-            playerScore={match.player}
-            enemyScore={match.enemy}
-          />
         </div>
       </div>
 
