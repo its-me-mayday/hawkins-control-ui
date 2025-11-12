@@ -145,3 +145,39 @@ body{
   .animate-hk-lose,
   .animate-hk-draw { animation: none !important; }
 }
+
+/* press feedback on click */
+@keyframes hk-press {
+  0% { transform: scale(1); }
+  45% { transform: scale(.98); }
+  100% { transform: scale(1); }
+}
+.animate-hk-press { animation: hk-press .15s ease-out; }
+
+/* outcome glow on the selected card */
+@keyframes hk-card-win {
+  0% { box-shadow: 0 0 0 rgba(16,185,129,0); }
+  40% { box-shadow: 0 0 20px rgba(16,185,129,.45); }
+  100% { box-shadow: 0 0 0 rgba(16,185,129,0); }
+}
+@keyframes hk-card-lose {
+  0%,100% { transform: translateX(0); box-shadow: none; }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes hk-card-draw {
+  0%,100% { opacity: 1; }
+  50% { opacity: .78; }
+}
+.animate-card-win  { animation: hk-card-win .6s ease-out;   }
+.animate-card-lose { animation: hk-card-lose .45s ease-in-out; }
+.animate-card-draw { animation: hk-card-draw .6s ease-in-out;  }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hk-press,
+  .animate-card-win,
+  .animate-card-lose,
+  .animate-card-draw { animation: none !important; }
+}

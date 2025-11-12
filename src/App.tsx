@@ -13,6 +13,11 @@ export default function App() {
   const [scoreboard, setScoreboard] = useState<Scoreboard>(createInitialScoreboard());
   
   const onPick = (choice: HawkinsSymbol) => {
+    requestAnimationFrame(() => {
+      const btn = document.activeElement as HTMLElement | null;
+      if (btn) { btn.classList.add("animate-hk-press"); setTimeout(() => btn.classList.remove("animate-hk-press"), 160); }
+    });
+    
     setPlayerChoice(choice);
     const enemy = getRandomSymbol();
     setEnemyChoice(enemy);
@@ -55,8 +60,11 @@ export default function App() {
       <GameArea variant="player" title="Player" subtitle="Choose your side">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 p-2">
           {HAWKINS_SYMBOLS.map((symbol) => (
-            <StrangerCard key={symbol} label={symbol} 
+            <StrangerCard 
+              key={symbol} 
+              label={symbol} 
               selected={playerChoice === symbol}
+              outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
               onSelect={() => onPick(symbol)}
             />
           ))}
