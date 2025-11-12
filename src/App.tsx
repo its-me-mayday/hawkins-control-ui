@@ -14,6 +14,7 @@ import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
+import { useAmbience80s } from "./hooks/useAmbience80s";
 
 export default function App() {
   const {
@@ -36,7 +37,23 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [started, setStarted] = useState(false);
   const [battleShown, setBattleShown] = useState(false);
+
+  const [ambienceEnabled, setAmbienceEnabled] = useState<boolean>(() => {
+    try { return JSON.parse(localStorage.getItem("hawkins-control:ambience") || "true"); } catch { return true; }
+  });
+  const [sfxEnabled, setSfxEnabled] = useState<boolean>(() => {
+    try { return JSON.parse(localStorage.getItem("hawkins-control:sfx") || "true"); } catch { return true; }
+  });
+
   const synth = useSynth();
+  const ambience = useAmbience80s();
+
+  useEffect(() => {
+    try { localStorage.setItem("hawkins-control:ambience", JSON.stringify(ambienceEnabled)); } catch {}
+  }, [ambienceEnabled]);
+  useEffect(() => {
+    try { localStorage.setItem("hawkins-control:sfx", JSON.stringify(sfxEnabled)); } catch {}
+  }, [sfxEnabled]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
   const playerFolded =
@@ -57,7 +74,15 @@ export default function App() {
     setTargetWins(rounds);
     setStarted(true);
     setBattleShown(false);
+    if (ambienceEnabled) ambience.start({ volume: 0.06 });
   };
+
+  useEffect(() => {
+    if (!started) return;
+    if (ambienceEnabled) ambience.start({ volume: 0.06 });
+    else ambience.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ambienceEnabled, started]);
 
   useEffect(() => {
     if (started && !matchOver && !playerChoice && !enemyChoice) setBattleShown(false);
@@ -65,11 +90,11 @@ export default function App() {
 
   useEffect(() => {
     const out = lastRound?.outcome;
-    if (!out) return;
+    if (!out || !sfxEnabled) return;
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
-  }, [lastRound?.outcome]);
+  }, [lastRound?.outcome, sfxEnabled]);
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
@@ -83,8 +108,10 @@ export default function App() {
         </div>
         <SettingsDialog
           open={settingsOpen}
-          targetWins={targetWins}
-          onChangeTarget={setTargetWins}
+          ambienceEnabled={ambienceEnabled}
+          sfxEnabled={sfxEnabled}
+          onToggleAmbience={() => setAmbienceEnabled(v => !v)}
+          onToggleSfx={() => setSfxEnabled(v => !v)}
           onClose={() => setSettingsOpen(false)}
         />
       </header>
@@ -131,7 +158,7 @@ export default function App() {
               subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
               className={battleAnim}
             >
-              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={setTargetWins} showTarget={false} />
+              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={() => {}} showTarget={false} />
               <BattleDuel
                 player={started ? playerChoice : null}
                 enemy={started ? enemyChoice : null}
@@ -166,6 +193,7 @@ export default function App() {
         open={matchOver}
         winnerText={winnerText}
         onNewMatch={() => {
+          ambience.stop();
           resetMatch();
           setStarted(false);
           setBattleShown(false);
