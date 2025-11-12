@@ -32,7 +32,20 @@ export default function App() {
         <EnemyView choice={enemyChoice ?? null} />
       </GameArea>
 
-      <GameArea variant="battle" title="Battle" subtitle="Fate is decided in the neon flicker.">
+      <GameArea 
+      variant="battle" 
+      title="Battle" 
+      subtitle="Fate is decided in the neon flicker."
+      className={
+        lastRound?.outcome === "PLAYER"
+          ? "animate-hk-win"
+          : lastRound?.outcome === "ENEMY"
+          ? "animate-hk-lose"
+          : lastRound?.outcome === "DRAW"
+          ? "animate-hk-draw"
+          : ""
+        }
+      >
         <BattleView
           narration={lastRound?.narration ?? null}
           result={lastRound?.outcome ?? null}
