@@ -14,6 +14,7 @@ import StatsDialog from "./components/StatsDialog";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
+import MatchBadge from "./components/MatchBadge";
 
 const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
 
@@ -106,51 +107,59 @@ export default function App() {
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
-      <header className="text-center mb-8 relative pr-28 sm:pr-36">
+      {/* NAVBAR (parziale a sinistra, icone a destra) */}
+      <div className="mb-2">
+        <nav className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <MatchBadge player={match.player} enemy={match.enemy} targetWins={targetWins} />
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <IconButton
+              label="Open stats"
+              onClick={() => setStatsOpen(true)}
+              className="w-9 h-9 md:w-10 md:h-10"
+              title="Stats"
+            >
+              <img src={UI_ART.STATS.src} alt={UI_ART.STATS.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
+            </IconButton>
+            <IconButton
+              label="Open settings"
+              onClick={() => setSettingsOpen(true)}
+              className="w-9 h-9 md:w-10 md:h-10"
+              title="Settings"
+            >
+              <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
+            </IconButton>
+          </div>
+        </nav>
+      </div>
+
+      {/* TITOLO E SOTTOTITOLO SOTTO LA NAVBAR */}
+      <header className="text-center mb-4">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
         <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
-
-        <div className="absolute right-0 top-0 flex items-center gap-2 sm:gap-3">
-          <IconButton
-            label="Open stats"
-            onClick={() => setStatsOpen(true)}
-            className="w-9 h-9 md:w-10 md:h-10"
-            title="Stats"
-          >
-            <img src={UI_ART.STATS.src} alt={UI_ART.STATS.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
-          </IconButton>
-
-          <IconButton
-            label="Open settings"
-            onClick={() => setSettingsOpen(true)}
-            className="w-9 h-9 md:w-10 md:h-10"
-            title="Settings"
-          >
-            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
-          </IconButton>
-        </div>
-
-        <SettingsDialog
-          open={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          musicOn={musicOn}
-          sfxOn={sfxOn}
-          musicVolume={musicVolume}
-          onToggleMusic={(v) => { setMusicOn(v); if (v) ambience.arm(); }}
-          onToggleSfx={(v) => { setSfxOn(v); if (v) synth.arm(); }}
-          onChangeMusicVolume={(v) => setMusicVolume(v)}
-        />
-
-        <StatsDialog
-          open={statsOpen}
-          onClose={() => setStatsOpen(false)}
-          wins={scoreboard.wins}
-          losses={scoreboard.losses}
-          draws={scoreboard.draws}
-          playerScore={match.player}
-          enemyScore={match.enemy}
-        />
       </header>
+
+      {/* Dialog centrati */}
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        musicOn={musicOn}
+        sfxOn={sfxOn}
+        musicVolume={musicVolume}
+        onToggleMusic={(v) => { setMusicOn(v); if (v) ambience.arm(); }}
+        onToggleSfx={(v) => { setSfxOn(v); if (v) synth.arm(); }}
+        onChangeMusicVolume={(v) => setMusicVolume(v)}
+      />
+      <StatsDialog
+        open={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        wins={scoreboard.wins}
+        losses={scoreboard.losses}
+        draws={scoreboard.draws}
+        playerScore={match.player}
+        enemyScore={match.enemy}
+      />
 
       <div className="grid lg:grid-cols-1 items-start">
         <div className="space-y-6 min-w-0">
