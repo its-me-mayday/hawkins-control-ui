@@ -93,7 +93,7 @@ body{
       0 0 48px rgba(161,0,59,0.45);
     filter: saturate(120%) brightness(1);
   }
-  92% {
+  80% {
     opacity: .92;
     text-shadow:
       0 0 8px rgba(255,17,51,0.7),
@@ -101,7 +101,7 @@ body{
       0 0 28px rgba(161,0,59,0.30);
     filter: saturate(110%) brightness(.95);
   }
-  96% {
+  90% {
     opacity: .8;
     text-shadow:
       0 0 4px rgba(255,17,51,0.4),
@@ -115,4 +115,4 @@ body{
   .animate-hk-flash { animation: none !important; }
 }
 
-.animate-hk-flash { animation: hk-flash 1s infinite; }
+.animate-hk-flash { animation: hk-flash 5s infinite; }
