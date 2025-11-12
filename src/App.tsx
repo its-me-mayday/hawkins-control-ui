@@ -1,7 +1,5 @@
-// src/App.tsx
 import "./index.css";
 import GameArea from "./sections/GameArea";
-import BattleView from "./sections/BattleView";
 import StrangerCard from "./components/StrangerCard";
 import ControlsBar from "./components/ControlsBar";
 import { ART, UI_ART } from "./assets/art";
@@ -144,7 +142,7 @@ export default function App() {
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
             <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-8 h-8 md:w-10 md:h-10" draggable={false} />
@@ -219,16 +217,11 @@ export default function App() {
                 player={started ? playerChoice : null}
                 enemy={started ? enemyChoice : null}
                 outcome={started ? (lastRound?.outcome ?? null) : null}
+                narration={started ? (lastRound?.narration ?? null) : null}
                 locked={awaitNextRound}
                 thinking={started && enemyThinking}
                 progress={enemyProgress}
               />
-              <div className="mt-4">
-                <BattleView
-                  narration={started ? (lastRound?.narration ?? null) : null}
-                  result={started ? (lastRound?.outcome ?? null) : null}
-                />
-              </div>
             </GameArea>
           )}
         </div>
