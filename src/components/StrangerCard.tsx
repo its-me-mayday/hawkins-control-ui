@@ -3,12 +3,15 @@ import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 type Outcome = "PLAYER" | "ENEMY" | "DRAW";
 
 type StrangerCardProps = {
-  label: HawkinsSymbol;             // usa il tipo della lib
+  label: HawkinsSymbol;
   selected?: boolean;
   outcomeForSelected?: Outcome | null;
   onSelect?: () => void;
   imageSrc?: string;
   imageAlt?: string;
+  imageFit?: "cover" | "contain";
+  imagePosition?: string;   // es. "center 20%"
+  aspect?: string;          // es. "4/3", "3/4", "16/9"
 };
 
 const ACCENT_BY_SYMBOL: Record<HawkinsSymbol, string> = {
@@ -24,6 +27,9 @@ export default function StrangerCard({
   onSelect,
   imageSrc,
   imageAlt,
+  imageFit = "contain",
+  imagePosition = "center",
+  aspect = "4/3",
 }: StrangerCardProps) {
   const accent = ACCENT_BY_SYMBOL[label];
 
@@ -36,7 +42,6 @@ export default function StrangerCard({
       ? "animate-card-draw"
       : "";
 
-  // glitch solo se questa card è la selezionata e hai perso
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
 
   return (
@@ -49,23 +54,29 @@ export default function StrangerCard({
         outcomeAnim,
       ].join(" ")}
       style={{
-        // bordo/ombra del pannello card colorati per-simbolo
         borderColor: `${accent}55`,
         boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
       }}
     >
-      {/* media */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+      {/* media wrapper con aspect dinamico */}
+      <div
+        className={`relative w-full overflow-hidden rounded-lg aspect-[${aspect}]`}
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.35)), radial-gradient(60% 50% at 50% 0%, rgba(255,255,255,.06), transparent 60%)",
+        }}
+      >
         {imageSrc ? (
           <img
             src={imageSrc}
             alt={imageAlt || label.replace("_", " ")}
             loading="lazy"
             className={[
-              "h-full w-full object-cover transition-transform duration-200 will-change-transform",
-              "hover:scale-[1.03]",
+              "h-full w-full transition-transform duration-200 will-change-transform",
+              imageFit === "contain" ? "object-contain" : "object-cover",
               imgGlitch,
             ].join(" ")}
+            style={{ objectPosition: imagePosition }}
           />
         ) : (
           <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">
@@ -73,21 +84,20 @@ export default function StrangerCard({
           </div>
         )}
 
-        {/* overlay gradiente per-simbolo */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, ${accent}22 0%, transparent 55%)`,
-          }}
-        />
+        {/* bande “letterbox” morbide quando usi contain */}
+        {imageFit === "contain" && (
+          <>
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.12),transparent_30%,transparent_70%,rgba(0,0,0,.18))]" />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ boxShadow: "inset 0 0 24px rgba(0,0,0,.25)" }}
+            />
+          </>
+        )}
       </div>
 
-      {/* label */}
       <div className="mt-3 text-center uppercase tracking-widest">
-        <span
-          className="text-sm sm:text-base"
-          style={{ color: accent }}
-        >
+        <span className="text-sm sm:text-base" style={{ color: accent }}>
           {label.replace("_", " ")}
         </span>
       </div>

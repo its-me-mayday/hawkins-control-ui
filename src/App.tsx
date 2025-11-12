@@ -354,6 +354,9 @@ useEffect(() => {
               imageSrc={ART[symbol].src}
               imageAlt={ART[symbol].alt}
               onSelect={() => onPick(symbol)}
+              imageFit={ART[symbol].fit}
+              imagePosition={ART[symbol].pos}
+              aspect={ART[symbol].aspect}
             />
           ))}
         </div>
