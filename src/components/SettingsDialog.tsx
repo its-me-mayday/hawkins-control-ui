@@ -27,12 +27,12 @@ export default function SettingsDialog({ open, targetWins, onClose, onChangeTarg
       <div className="p-4 sm:p-5">
         <h3 className="hk-title text-sm tracking-[.28em] mb-4">SETTINGS</h3>
 
-        <label className="block text-xs uppercase tracking-widest text-[color:var(--hawkins-muted)] mb-2">
+        <label className="block text-xs uppercase tracking-widest text-(--hawkins-muted) mb-2">
           First to
         </label>
         <select
-          className="w-full bg-transparent border border-[color:var(--hawkins-muted)]/30 rounded px-3 py-2
-                     text-[color:var(--hawkins-ink)]"
+          className="w-full bg-transparent border border-(--hawkins-muted)/30 rounded px-3 py-2
+                     text-(--hawkins-ink)"
           value={String(targetWins)}
           onChange={(e) => onChangeTarget(parseInt(e.target.value, 10))}
         >
