@@ -52,10 +52,7 @@ export default function StrangerCard({
 
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
   const effectiveSrc = useWinImage && imageWinSrc ? imageWinSrc : useLoseImage && imageLoseSrc ? imageLoseSrc : imageSrc;
-  
   const loseTone = selected && outcomeForSelected === "ENEMY" ? "saturate-[.85]" : "";
-// poi nel className del <img> aggiungi loseTone:
-
   
   return (
     <button
@@ -63,7 +60,7 @@ export default function StrangerCard({
       className={[
         "hk-card w-full text-left transition-all overflow-hidden",
         "focus:outline-none",
-        selected ? "ring-2 ring-[var(--hawkins-red)] ring-offset-0" : "",
+        selected ? "ring-2 ring-(--hawkins-red) ring-offset-0" : "",
         outcomeAnim,
       ].join(" ")}
       style={{
@@ -92,12 +89,11 @@ export default function StrangerCard({
             style={{ objectPosition: imagePosition }}
           />
         ) : (
-          <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">
+          <div className="h-full w-full grid place-items-center text-(--hawkins-muted)">
             No image
           </div>
         )}
 
-        {/* bande “letterbox” morbide quando usi contain */}
         {imageFit === "contain" && (
           <>
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.12),transparent_30%,transparent_70%,rgba(0,0,0,.18))]" />
