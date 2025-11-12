@@ -106,8 +106,7 @@ export default function App() {
   }, [lastRound?.outcome, sfxOn]);
 
   return (
-    <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
-      {/* NAVBAR (parziale a sinistra, icone a destra) */}
+<main className="min-h-screen px-4 sm:px-8 py-6 sm:py-8 space-y-5 sm:space-y-6">
       <div className="mb-2">
         <nav className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -134,10 +133,13 @@ export default function App() {
         </nav>
       </div>
 
-      {/* TITOLO E SOTTOTITOLO SOTTO LA NAVBAR */}
-      <header className="text-center mb-4">
-        <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
+      <header className="text-center mb-6 sm:mb-8 relative pr-24 sm:pr-36">
+      <h1 className="hk-title animate-hk-flash" style={{fontSize: "var(--hk-title-size)"}}>
+  Hawkins Control
+</h1>
+<p className="text-(--hawkins-muted) mt-1 sm:mt-2" style={{fontSize:"var(--hk-sub-size)"}}>
+  Eleven vs Demogorgon vs Hawkins Lab
+</p>
       </header>
 
       {/* Dialog centrati */}
@@ -161,8 +163,8 @@ export default function App() {
         enemyScore={match.enemy}
       />
 
-      <div className="grid lg:grid-cols-1 items-start">
-        <div className="space-y-6 min-w-0">
+<div className="grid lg:grid-cols-1 items-start">
+<div className="space-y-5 sm:space-y-6 min-w-0">
           <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
             <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
               <div className="relative">

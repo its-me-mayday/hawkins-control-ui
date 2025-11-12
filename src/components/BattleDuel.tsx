@@ -15,11 +15,14 @@ type Props = {
 
 function ProgressCard({ label, progress = 0 }: { label: string; progress?: number }) {
   return (
-    <div className="hk-card w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[220px]">
+    <div className="hk-card w-full" style={{ maxWidth: "min(64vw, 220px)" }}>
       <div className="text-[11px] sm:text-xs uppercase tracking-widest text-[color:var(--hawkins-muted)] mb-2">
         {label}
       </div>
-      <div className="h-[140px] sm:h-[160px] lg:h-[180px] w-full grid place-items-center text-[color:var(--hawkins-muted)]/80">
+      <div
+        className="w-full grid place-items-center text-[color:var(--hawkins-muted)]/80"
+        style={{ height: "clamp(120px, 38vw, 180px)" }}
+      >
         Thinking…
       </div>
       <div className="mt-2">
@@ -50,7 +53,10 @@ function DuelCard({
   if (!symbol) {
     return (
       <div className="flex justify-center">
-        <div className="hk-card w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[220px] grid place-items-center text-[color:var(--hawkins-muted)]">
+        <div
+          className="hk-card w-full grid place-items-center text-[color:var(--hawkins-muted)]"
+          style={{ maxWidth: "min(64vw, 220px)", height: "clamp(120px, 38vw, 180px)" }}
+        >
           {who === "PLAYER" ? "Pick a card" : "Waiting..."}
         </div>
       </div>
@@ -76,17 +82,20 @@ function DuelCard({
   const accent =
     symbol === "ELEVEN" ? "var(--accent-eleven)" : symbol === "DEMOGORGON" ? "var(--accent-demog)" : "var(--accent-lab)";
 
+  const enemyRevealFx = who === "ENEMY" && symbol ? "hk-portal hk-crt-jitter" : "";
+
   return (
     <div className="flex justify-center">
       <div
-        className={["hk-card overflow-hidden w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[220px]", anim].join(" ")}
+        className={["hk-card overflow-hidden w-full", anim, enemyRevealFx].join(" ")}
         style={{
+          maxWidth: "min(64vw, 220px)",
           borderColor: `${accent}55`,
           boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
         }}
       >
         <div className="relative w-full overflow-hidden rounded-lg grid place-items-center">
-          <div className="h-[140px] sm:h-[160px] lg:h-[180px] w-full relative">
+          <div className="w-full relative" style={{ height: "clamp(120px, 38vw, 180px)" }}>
             <img
               src={src}
               alt={art.alt}
@@ -114,41 +123,46 @@ function DuelCard({
   );
 }
 
-function OutcomeBadge({ outcome }: { outcome: Outcome }) {
-  let text = "VS";
-  let tone = "text-[color:var(--hawkins-muted)]";
-  let glow: string | undefined;
-  let anim = "";
+function CenterOutcome({
+  outcome,
+  narration,
+}: {
+  outcome: Outcome;
+  narration?: string | null;
+}) {
+  const label =
+    outcome === "PLAYER" ? "YOU WIN" : outcome === "ENEMY" ? "YOU LOSE" : outcome === "DRAW" ? "DRAW" : "VS";
 
-  if (outcome === "PLAYER") {
-    text = "YOU WIN";
-    tone = "text-emerald-400";
-    glow = "0 0 10px rgba(16,185,129,.65), 0 0 22px rgba(16,185,129,.35)";
-    anim = "animate-hk-win";
-  } else if (outcome === "ENEMY") {
-    text = "YOU LOSE";
-    tone = "text-rose-400";
-    glow = "0 0 10px rgba(244,63,94,.65), 0 0 22px rgba(244,63,94,.35)";
-    anim = "animate-hk-lose";
-  } else if (outcome === "DRAW") {
-    text = "DRAW";
-    tone = "text-sky-400";
-    glow = "0 0 10px rgba(56,189,248,.65), 0 0 22px rgba(56,189,248,.35)";
-    anim = "animate-hk-draw";
-  }
+  const color =
+    outcome === "PLAYER"
+      ? "#34d399" // emerald-400
+      : outcome === "ENEMY"
+      ? "#fb7185" // rose-400
+      : outcome === "DRAW"
+      ? "#38bdf8" // sky-400
+      : "var(--hawkins-muted)";
+
+  const glow =
+    outcome === null
+      ? "0 0 0 rgba(0,0,0,0)"
+      : `0 0 6px ${color}, 0 0 14px ${color}88, 0 0 26px ${color}55`;
 
   return (
-    <div
-      className={[
-        "text-center uppercase tracking-widest",
-        "text-[11px] sm:text-xs md:text-sm",
-        "px-2 py-1 rounded",
-        tone,
-        anim,
-      ].join(" ")}
-      style={{ textShadow: glow }}
-    >
-      {text}
+    <div className="grid place-items-center text-center px-2">
+      <div
+        className="uppercase tracking-[.28em] font-semibold"
+        style={{
+          fontSize: "clamp(16px, 4.8vw, 24px)",
+          color,
+          textShadow: glow,
+          letterSpacing: ".28em",
+        }}
+      >
+        {label}
+      </div>
+      <div className="mt-1 text-[12px] sm:text-[13px] text-(--hawkins-muted)">
+        {narration ?? (outcome ? "" : "Make your move")}
+      </div>
     </div>
   );
 }
@@ -163,17 +177,10 @@ export default function BattleDuel({
   progress = 0,
 }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-start gap-3 sm:gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-5">
       <DuelCard who="PLAYER" symbol={player ?? null} outcome={outcome} locked={locked} align="left" />
 
-      <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
-        <OutcomeBadge outcome={outcome} />
-        {narration ? (
-          <p className="text-[11px] sm:text-xs text-[color:var(--hawkins-ink)]/90 max-w-[22ch]">
-            {narration}
-          </p>
-        ) : null}
-      </div>
+      <CenterOutcome outcome={outcome} narration={narration ?? null} />
 
       <div className="flex justify-center">
         {thinking && !enemy ? (

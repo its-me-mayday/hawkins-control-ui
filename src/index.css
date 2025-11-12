@@ -332,3 +332,43 @@ body{
   /* per evitare zoom strani su mobile */
   overscroll-behavior: contain;
 }
+
+/* === Mobile-first helpers === */
+:root{
+  --hk-pad: clamp(10px, 3.5vw, 18px);
+  --hk-gap: clamp(10px, 3.2vw, 16px);
+  --hk-radius: 16px;
+  --hk-title-size: clamp(22px, 6vw, 36px);
+  --hk-sub-size: clamp(11px, 2.7vw, 14px);
+  --hk-card-title: clamp(11px, 2.6vw, 14px);
+  --hk-safe-top: env(safe-area-inset-top);
+  --hk-safe-bottom: env(safe-area-inset-bottom);
+}
+
+html, body { height: 100%; }
+body {
+  min-height: 100dvh; /* migliore su mobile */
+  padding-block: calc(var(--hk-safe-top) * 1 + 8px) calc(var(--hk-safe-bottom) * 1 + 8px);
+}
+
+/* Pannelli compatti su mobile */
+.hk-panel { padding: var(--hk-pad); }
+.hk-panel > header { margin-bottom: clamp(8px, 2.5vw, 14px) !important; }
+
+/* Tipografia fluida base */
+.hk-title { font-size: var(--hk-sub-size); letter-spacing: .28em; }
+
+/* Pulsanti più “touchable” su mobile */
+.hk-btn { padding: clamp(10px, 3.2vw, 14px) clamp(14px, 4vw, 18px); }
+
+/* Riduci glow/shadow pesanti sugli schermi piccoli */
+@media (max-width: 480px){
+  .hk-card, .hk-panel{
+    box-shadow: 0 8px 20px rgba(0,0,0,.4), 0 0 12px rgba(255,17,51,.10) !important;
+  }
+}
+
+/* Preferenze utente: meno motion = niente animazioni */
+@media (prefers-reduced-motion: reduce){
+  * { animation: none !important; transition: none !important; }
+}
