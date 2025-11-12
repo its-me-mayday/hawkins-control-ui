@@ -1,11 +1,13 @@
 type StrangerCardProps = {
     label: string;
     selected?: boolean;
+    onSelect?: () => void;
   };
   
-  export default function StrangerCard({ label, selected }: StrangerCardProps) {
+  export default function StrangerCard({ label, selected, onSelect }: StrangerCardProps) {
     return (
       <button
+        onClick={onSelect}
         className={[
           "hk-card w-full text-center uppercase tracking-widest transition-all",
           selected ? "ring-2 ring-(--hawkins-red) ring-offset-0" : ""
