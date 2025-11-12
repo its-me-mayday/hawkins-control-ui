@@ -1,4 +1,5 @@
 // src/App.tsx
+import { useSynth } from "./hooks/useSynth";
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import BattleView from "./sections/BattleView";
@@ -12,8 +13,8 @@ import SettingsDialog from "./components/SettingsDialog";
 import StatsPanel from "./components/StatsPanel";
 import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
-import { useState } from "react";
 import EndOverlay from "./components/EndOverlay";
+import { useEffect, useState } from "react";
 
 export default function App() {
   const {
@@ -30,19 +31,38 @@ export default function App() {
       enemyThinking,
       enemyProgress,
     },
-    actions: { setTargetWins, onPick, nextRound, resetMatch },
+    actions: { setTargetWins, onPick, resetMatch },
   } = useGameController();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [started, setStarted] = useState(false);
+  const synth = useSynth();
 
   const startMatch = (rounds: number) => {
+    synth.arm(); 
     resetMatch();
     setTargetWins(rounds);
     setStarted(true);
   };
+  
+  useEffect(() => {
+    if (playerChoice && !matchOver) synth.select();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerChoice]);
+  
+  useEffect(() => {
+    const out = lastRound?.outcome;
+    if (!out) return;
+    if (out === "PLAYER") synth.win();
+    else if (out === "ENEMY") synth.lose();
+    else synth.draw();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastRound?.outcome]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
+
+  // Fold: chiudi Player quando sta “pensando” il nemico o quando celebri l’esito
+  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver);
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
@@ -72,40 +92,42 @@ export default function App() {
       <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6 items-start">
         {/* COLONNA SINISTRA — Player PRIMA, poi Battle */}
         <div className="space-y-6 min-w-0">
-          {/* PLAYER (ora sopra) */}
-          <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
-            <div className="relative">
-              <div
-                className={`grid grid-cols-3 gap-5 mt-2 ${
-                  disablePlay ? "opacity-60 pointer-events-none" : ""
-                }`}
-              >
-                {HAWKINS_SYMBOLS.map((symbol: HawkinsSymbol) => (
-                  <div key={symbol} className="flex justify-center">
-                    <StrangerCard
-                      label={symbol}
-                      selected={playerChoice === symbol}
-                      outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
-                      imageSrc={ART[symbol].src}
-                      imageWinSrc={ART[symbol].win}
-                      imageLoseSrc={ART[symbol].lose}
-                      imageAlt={ART[symbol].alt}
-                      imageFit={ART[symbol].fit}
-                      imagePosition={ART[symbol].pos}
-                      useWinImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"}
-                      useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
-                      aspect={ART[symbol].aspect}
-                      onSelect={() => onPick(symbol)}
-                      className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
-                      titleSize="sm"
-                    />
-                  </div>
-                ))}
+          {/* PLAYER (foldabile) */}
+          <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
+            <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
+              <div className="relative">
+                <div
+                  className={`grid grid-cols-3 gap-5 mt-2 ${
+                    disablePlay ? "opacity-60 pointer-events-none" : ""
+                  }`}
+                >
+                  {HAWKINS_SYMBOLS.map((symbol: HawkinsSymbol) => (
+                    <div key={symbol} className="flex justify-center">
+                      <StrangerCard
+                        label={symbol}
+                        selected={playerChoice === symbol}
+                        outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
+                        imageSrc={ART[symbol].src}
+                        imageWinSrc={ART[symbol].win}
+                        imageLoseSrc={ART[symbol].lose}
+                        imageAlt={ART[symbol].alt}
+                        imageFit={ART[symbol].fit}
+                        imagePosition={ART[symbol].pos}
+                        useWinImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"}
+                        useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
+                        aspect={ART[symbol].aspect}
+                        onSelect={() => onPick(symbol)}
+                        className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
+                        titleSize="sm"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </GameArea>
+            </GameArea>
+          </div>
 
-          {/* BATTLE (ora sotto) */}
+          {/* BATTLE */}
           <GameArea
             variant="battle"
             title="Battle"
@@ -126,21 +148,6 @@ export default function App() {
               onChangeTarget={setTargetWins}
               showTarget={false}
             />
-
-            {winnerText ? (
-              <div className="mt-2 hk-card text-center space-y-3 animate-hk-flash">
-                <div className="text-sm">{winnerText}</div>
-                <button
-                  className="hk-btn hk-btn--danger"
-                  onClick={() => {
-                    resetMatch();
-                    setStarted(false);
-                  }}
-                >
-                  New Match
-                </button>
-              </div>
-            ) : null}
 
             <BattleDuel
               player={started ? playerChoice : null}
@@ -172,15 +179,18 @@ export default function App() {
         </div>
       </div>
 
+      {/* Overlay di START */}
       <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
+
+      {/* Overlay di FINE MATCH */}
       <EndOverlay
-  open={matchOver}
-  winnerText={winnerText}
-  onNewMatch={() => {
-    resetMatch();
-    setStarted(false);
-  }}
-/>
+        open={matchOver}
+        winnerText={winnerText}
+        onNewMatch={() => {
+          resetMatch();
+          setStarted(false);
+        }}
+      />
     </main>
   );
 }

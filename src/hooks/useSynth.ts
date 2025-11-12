@@ -3,8 +3,15 @@ import { useRef } from "react";
 export function useSynth() {
   const ctxRef = useRef<AudioContext | null>(null);
   const ensureCtx = () =>
-    (ctxRef.current ??= new (window.AudioContext ||
-      (window as any).webkitAudioContext)());
+    (ctxRef.current ??= new (window.AudioContext || (window as any).webkitAudioContext)());
+
+  const arm = async () => {
+    const ctx = ensureCtx();
+    if (ctx.state !== "running") {
+      try { await ctx.resume(); } catch {}
+    }
+  };
+
   const now = () => ensureCtx().currentTime;
 
   const mkGain = (v = 0.1) => {
@@ -124,5 +131,5 @@ export function useSynth() {
     o.stop(t0 + 0.18);
   };
 
-  return { select, win, lose, draw };
+  return { arm, select, win, lose, draw }; // ← aggiunto arm
 }

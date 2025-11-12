@@ -251,3 +251,20 @@ body{
 
 .hk-icon img{ filter: drop-shadow(0 0 8px rgba(255,17,51,.25)); transition: filter .15s ease; }
 .hk-icon:hover img{ filter: drop-shadow(0 0 14px rgba(255,17,51,.45)); }
+
+.hk-fold {
+  transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+  will-change: max-height, opacity, transform;
+}
+.hk-fold.hk-fold--open {
+  max-height: 640px;
+  opacity: 1;
+  transform: scaleY(1);
+}
+.hk-fold.hk-fold--collapsed {
+  max-height: 0;
+  opacity: 0;
+  transform: scaleY(.98);
+  overflow: hidden;
+  pointer-events: none;
+}
