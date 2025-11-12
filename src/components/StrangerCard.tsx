@@ -8,10 +8,14 @@ type StrangerCardProps = {
   outcomeForSelected?: Outcome | null;
   onSelect?: () => void;
   imageSrc?: string;
+  imageWinSrc?: string,
+  imageLoseSrc?: string,
   imageAlt?: string;
   imageFit?: "cover" | "contain";
-  imagePosition?: string;   // es. "center 20%"
-  aspect?: string;          // es. "4/3", "3/4", "16/9"
+  imagePosition?: string;
+  aspect?: string;
+  useWinImage?: boolean;
+  useLoseImage?: boolean;
 };
 
 const ACCENT_BY_SYMBOL: Record<HawkinsSymbol, string> = {
@@ -26,10 +30,14 @@ export default function StrangerCard({
   outcomeForSelected,
   onSelect,
   imageSrc,
+  imageWinSrc,
+  imageLoseSrc,
   imageAlt,
   imageFit = "contain",
   imagePosition = "center",
   aspect = "4/3",
+  useWinImage = false,
+  useLoseImage = false,
 }: StrangerCardProps) {
   const accent = ACCENT_BY_SYMBOL[label];
 
@@ -43,7 +51,9 @@ export default function StrangerCard({
       : "";
 
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
+  const effectiveSrc = useWinImage && imageWinSrc ? imageWinSrc : useLoseImage && imageLoseSrc ? imageLoseSrc : imageSrc;
 
+  
   return (
     <button
       onClick={onSelect}
@@ -58,7 +68,6 @@ export default function StrangerCard({
         boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
       }}
     >
-      {/* media wrapper con aspect dinamico */}
       <div
         className={`relative w-full overflow-hidden rounded-lg aspect-[${aspect}]`}
         style={{
@@ -68,7 +77,7 @@ export default function StrangerCard({
       >
         {imageSrc ? (
           <img
-            src={imageSrc}
+            src={effectiveSrc}
             alt={imageAlt || label.replace("_", " ")}
             loading="lazy"
             className={[

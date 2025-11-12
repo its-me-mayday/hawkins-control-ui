@@ -185,6 +185,9 @@ export default function App() {
   const [scoreboard, setScoreboard] = useState<Scoreboard>(createInitialScoreboard());
   const [targetWins, setTargetWins] = useState<number>(5); // first to N
   const [match, setMatch] = useState<{ player: number; enemy: number }>({ player: 0, enemy: 0 });
+  const [celebrate, setCelebrate] = useState<boolean>(false);
+  const [awaitNextRound, setAwaitNextRound] = useState(false); // lock dopo WIN/LOSE
+
   
   
   const synth = useSynth();
@@ -243,35 +246,36 @@ useEffect(() => {
 }, [targetWins, match, scoreboard]);
 
   
-  const onPick = (choice: HawkinsSymbol) => {
-    if (matchOver) return;
-    synth.select();
+const onPick = (choice: HawkinsSymbol) => {
+  if (matchOver || awaitNextRound) return; // blocca input se match finito o in attesa "New Round"
+  synth.select();
 
-    requestAnimationFrame(() => {
-      const btn = document.activeElement as HTMLElement | null;
-      if (btn) { btn.classList.add("animate-hk-press"); setTimeout(() => btn.classList.remove("animate-hk-press"), 160); }
-    });
-    
-    synth.select();
-    
-    setPlayerChoice(choice);
-    const enemy = getRandomSymbol();
-    setEnemyChoice(enemy);
-    
-    const round = judgeRound(choice, enemy);
-    setLastRound(round);
-    setScoreboard((prev) => applyRoundToScoreboard(prev, round));
-    
-    setMatch((m) => {
-      if (round.outcome === "PLAYER") return { ...m, player: m.player + 1 };
-      if (round.outcome === "ENEMY")  return { ...m, enemy: m.enemy + 1 };
-      return m;
-    });
-     
-    if (round.outcome === "PLAYER") synth.win();
-    else if (round.outcome === "ENEMY") synth.lose();
-    else synth.draw();
-  };
+  setPlayerChoice(choice);
+  const enemy = getRandomSymbol();
+  setEnemyChoice(enemy);
+
+  const round = judgeRound(choice, enemy);
+  setLastRound(round);
+  setScoreboard((prev) => applyRoundToScoreboard(prev, round));
+
+  setMatch((m) => {
+    if (round.outcome === "PLAYER") return { ...m, player: m.player + 1 };
+    if (round.outcome === "ENEMY")  return { ...m, enemy: m.enemy + 1 };
+    return m;
+  });
+
+  if (round.outcome === "PLAYER") { synth.win(); setCelebrate(true); setAwaitNextRound(true); }
+  else if (round.outcome === "ENEMY") { synth.lose(); setAwaitNextRound(true); }
+  else { synth.draw(); setAwaitNextRound(false); } // DRAW: niente lock
+};
+  
+const nextRound = () => {
+  setAwaitNextRound(false);
+  setCelebrate(false);
+  setPlayerChoice(null);
+  setEnemyChoice(null);
+  setLastRound(null);
+};;
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
@@ -310,19 +314,16 @@ useEffect(() => {
       onChange={(e) => setTargetWins(Number(e.target.value))}
       disabled={matchOver}
     >
-      {[3,5,7,10].map((n) => (
-        <option key={n} value={n}>{n}</option>
-      ))}
+      {[3,5,7,10].map((n) => <option key={n} value={n}>{n}</option>)}
     </select>
   </div>
 
   <div className="flex gap-2">
     <button
       onClick={resetMatch}
-      className="hk-btn hk-btn--danger hk-btn--shine hk-btn--pulse"
+      className="hk-btn hk-btn--danger"
       title="Reset match and scores"
     >
-      {/* icon: power */}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 2v10" />
         <path d="M7.5 4.2A9 9 0 1 0 16.5 4.2" />
@@ -342,9 +343,26 @@ useEffect(() => {
           result={lastRound?.outcome ?? null}
         />
       </GameArea>
+      
 
+      {awaitNextRound && !matchOver && (
+  <div className="flex justify-end">
+    <button
+      onClick={nextRound}
+      className="hk-btn hk-btn--ghost hk-btn--shine hk-btn--magnetic"
+      title="Start a new round"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M5 4l10 8-10 8V4z" />
+        <path d="M19 5v14" />
+      </svg>
+      New Round
+    </button>
+  </div>
+)}
       <GameArea variant="player" title="Player" subtitle="Choose your side">
-      <div className={`grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 ${matchOver ? "opacity-60 pointer-events-none" : ""}`}> 
+      <div className={`grid grid-cols-1 sm:grid-cols-3 gap-8 mt-2 ${awaitNextRound || matchOver ? "opacity-60 pointer-events-none" : ""}`}>
+
           {HAWKINS_SYMBOLS.map((symbol) => (
             <StrangerCard 
               key={symbol} 
@@ -352,10 +370,18 @@ useEffect(() => {
               selected={playerChoice === symbol}
               outcomeForSelected={playerChoice === symbol ? (lastRound?.outcome ?? null) : null}
               imageSrc={ART[symbol].src}
+              imageWinSrc={ART[symbol].win}
+              imageLoseSrc={ART[symbol].lose}
               imageAlt={ART[symbol].alt}
               onSelect={() => onPick(symbol)}
               imageFit={ART[symbol].fit}
               imagePosition={ART[symbol].pos}
+              useWinImage={
+                awaitNextRound && playerChoice === symbol && lastRound?.outcome === "PLAYER"
+              }
+              useLoseImage={
+                awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"
+              }
               aspect={ART[symbol].aspect}
             />
           ))}
