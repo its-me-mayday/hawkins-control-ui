@@ -1,7 +1,5 @@
-// src/App.tsx
 import "./index.css";
 import GameArea from "./sections/GameArea";
-import EnemyView from "./sections/EnemyView";
 import BattleView from "./sections/BattleView";
 import StrangerCard from "./components/StrangerCard";
 import ControlsBar from "./components/ControlsBar";
@@ -70,15 +68,8 @@ export default function App() {
       </header>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6 items-start">
+        {/* COLONNA SINISTRA — solo Battle + Player */}
         <div className="space-y-6 min-w-0">
-          <GameArea
-            variant="enemy"
-            title="Enemy"
-            subtitle={started ? "The computer is plotting..." : "Waiting for match to start"}
-          >
-            <EnemyView choice={started ? (enemyChoice ?? null) : null} />
-          </GameArea>
-
           <GameArea
             variant="battle"
             title="Battle"
@@ -173,6 +164,7 @@ export default function App() {
           </GameArea>
         </div>
 
+        {/* COLONNA DESTRA — setup + stats */}
         <div className="space-y-6 mt-6 lg:mt-0">
           <MatchSetupPanel
             onStart={startMatch}
