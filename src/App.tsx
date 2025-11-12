@@ -4,7 +4,6 @@ import EnemyView from "./sections/EnemyView";
 import BattleView from "./sections/BattleView";
 import StrangerCard from "./components/StrangerCard";
 import ControlsBar from "./components/ControlsBar";
-import NewRoundBar from "./components/NewRoundBar";
 import { ART, UI_ART } from "./assets/art";
 import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import { useGameController } from "./hooks/useGameController";
@@ -113,7 +112,6 @@ export default function App() {
             />
           </GameArea>
 
-          <NewRoundBar visible={started && awaitNextRound && !matchOver} onNext={nextRound} />
 
           <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
             <div className={`relative`}>

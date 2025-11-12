@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+// src/hooks/useGameController.ts
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   applyRoundToScoreboard,
   createInitialScoreboard,
@@ -56,36 +57,40 @@ export function useGameController(storageKey = "hawkins-control:v1") {
     } catch {}
   }, [storageKey, targetWins, match, scoreboard]);
 
-  const resetMatch = () => {
+  const resetMatch = useCallback(() => {
     setPlayerChoice(null);
     setEnemyChoice(null);
     setLastRound(null);
     setAwaitNextRound(false);
     setMatch({ player: 0, enemy: 0 });
     setScoreboard(createInitialScoreboard());
-  };
+  }, []);
 
-  const nextRound = () => {
+  const nextRound = useCallback(() => {
     setAwaitNextRound(false);
     setPlayerChoice(null);
     setEnemyChoice(null);
     setLastRound(null);
-  };
+  }, []);
 
-  const onPick = (choice: HawkinsSymbol) => {
+  const onPick = useCallback((choice: HawkinsSymbol) => {
     if (matchOver || awaitNextRound) return;
     synth.select();
+
     setPlayerChoice(choice);
     const enemy = getRandomSymbol();
     setEnemyChoice(enemy);
+
     const round = judgeRound(choice, enemy);
     setLastRound(round);
     setScoreboard((prev) => applyRoundToScoreboard(prev, round));
+
     setMatch((m) => {
       if (round.outcome === "PLAYER") return { ...m, player: m.player + 1 };
       if (round.outcome === "ENEMY") return { ...m, enemy: m.enemy + 1 };
       return m;
     });
+
     if (round.outcome === "PLAYER") {
       synth.win();
       setAwaitNextRound(true);
@@ -96,7 +101,13 @@ export function useGameController(storageKey = "hawkins-control:v1") {
       synth.draw();
       setAwaitNextRound(false);
     }
-  };
+  }, [awaitNextRound, matchOver, synth]);
+
+  useEffect(() => {
+    if (!awaitNextRound || matchOver) return;
+    const id = setTimeout(() => nextRound(), 3000);
+    return () => clearTimeout(id);
+  }, [awaitNextRound, matchOver, nextRound]);
 
   return {
     state: {

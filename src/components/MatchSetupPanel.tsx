@@ -12,12 +12,12 @@ type Props = {
       <div className="hk-panel space-y-3 sticky top-8">
         <h3 className="hk-title text-xs tracking-[.28em]">START MATCH</h3>
         <div className="grid grid-cols-1 gap-2">
-          <label className="text-[11px] uppercase tracking-widest text-[color:var(--hawkins-muted)]">
+          <label className="text-[11px] uppercase tracking-widest text-(--hawkins-muted)">
             First to
           </label>
           <select
-            className="w-full bg-transparent border border-[color:var(--hawkins-muted)]/30 rounded px-3 py-2
-                       text-[color:var(--hawkins-ink)]"
+            className="w-full bg-transparent border border-(--hawkins-muted)/30 rounded px-3 py-2
+                       text-(--hawkins-ink)"
             defaultValue={hasDefault ? String(defaultTarget) : ""}
             disabled={disabled}
             onChange={(e) => {
