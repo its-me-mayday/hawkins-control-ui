@@ -11,7 +11,7 @@ import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import StatsDialog from "./components/StatsDialog";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type SetStateAction } from "react";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
 import MatchBadge from "./components/MatchBadge";
@@ -27,7 +27,7 @@ function readAudioSettings() {
   } catch {}
   return null;
 }
-function writeAudioSettings(s) {
+function writeAudioSettings(s: { schemaVersion: number; musicOn: boolean; sfxOn: boolean; musicVolume: number; }) {
   try { localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s)); } catch {}
 }
 
@@ -84,7 +84,7 @@ export default function App() {
     return "";
   }, [lastRound?.outcome]);
 
-  const startMatch = (rounds) => {
+  const startMatch = (rounds: SetStateAction<number>) => {
     if (musicOn) ambience.arm();
     if (sfxOn) synth.arm();
     resetMatch();
