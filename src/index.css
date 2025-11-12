@@ -316,3 +316,19 @@ body{
   100% { transform: translate(0,0) skewX(0deg); filter: contrast(1) saturate(1); }
 }
 .hk-crt-jitter { animation: hk-crt-jitter-kf .45s steps(6, end); }
+
+/* ——— Center any <dialog> ——— */
+.hk-dialog {
+  /* rimuove il margin auto dei dialog */
+  margin: 0;
+  /* centering assoluto */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* sicurezza: dimensioni e scroll */
+  max-height: calc(100dvh - 5rem);
+  overflow: auto;
+  /* per evitare zoom strani su mobile */
+  overscroll-behavior: contain;
+}

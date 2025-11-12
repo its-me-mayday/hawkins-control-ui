@@ -30,16 +30,13 @@ export default function SettingsDialog({
   }, [open]);
 
   return (
-    <dialog
-      ref={ref}
-      className="rounded-xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
-                 backdrop:bg-black/60 p-0 w-[min(92vw,360px)]"
-      onClose={onClose}
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-    >
+<dialog
+  ref={ref}
+  className="hk-dialog rounded-xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
+             backdrop:bg-black/60 p-0 w-[min(92vw,360px)]"
+  onClose={onClose}
+  onCancel={(e) => { e.preventDefault(); onClose(); }}
+>
       <div className="p-3 sm:p-4 space-y-3">
         <h3 className="hk-title text-xs tracking-[.28em]">SETTINGS</h3>
 

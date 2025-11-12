@@ -32,13 +32,13 @@ export default function StatsDialog({
   const enemyWinRate = played ? Math.round((losses / played) * 100) : 0;
 
   return (
-    <dialog
-      ref={ref}
-      className="rounded-2xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
-                 backdrop:bg-black/60 p-0 w-[min(92vw,420px)]"
-      onClose={onClose}
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-    >
+<dialog
+  ref={ref}
+  className="hk-dialog rounded-2xl border border-[rgba(255,17,51,.35)] bg-[rgba(10,11,16,.92)]
+             backdrop:bg-black/60 p-0 w-[min(92vw,420px)]"
+  onClose={onClose}
+  onCancel={(e) => { e.preventDefault(); onClose(); }}
+>
       <div className="p-4 sm:p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="hk-title text-sm tracking-[.28em]">STATS</h3>
