@@ -52,6 +52,9 @@ export default function StrangerCard({
 
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
   const effectiveSrc = useWinImage && imageWinSrc ? imageWinSrc : useLoseImage && imageLoseSrc ? imageLoseSrc : imageSrc;
+  
+  const loseTone = selected && outcomeForSelected === "ENEMY" ? "saturate-[.85]" : "";
+// poi nel className del <img> aggiungi loseTone:
 
   
   return (
@@ -84,6 +87,7 @@ export default function StrangerCard({
               "h-full w-full transition-transform duration-200 will-change-transform",
               imageFit === "contain" ? "object-contain" : "object-cover",
               imgGlitch,
+              loseTone
             ].join(" ")}
             style={{ objectPosition: imagePosition }}
           />
