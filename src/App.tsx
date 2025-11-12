@@ -1,3 +1,4 @@
+// src/App.tsx
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import BattleView from "./sections/BattleView";
@@ -14,6 +15,44 @@ import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
+import { useAmbience } from "./hooks/useAmbience";
+
+const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
+
+type AudioSettingsV1 = {
+  schemaVersion: 1;
+  musicOn: boolean;
+  sfxOn: boolean;
+  musicVolume: number; // 0..1
+};
+
+function readAudioSettings(): AudioSettingsV1 | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.schemaVersion === 1) return parsed as AudioSettingsV1;
+    }
+    const legMusicOn = localStorage.getItem("hawkins:musicOn");
+    const legSfxOn = localStorage.getItem("hawkins:sfxOn");
+    const legVol = localStorage.getItem("hawkins:musicVolume");
+    if (legMusicOn || legSfxOn || legVol) {
+      return {
+        schemaVersion: 1,
+        musicOn: legMusicOn ? legMusicOn === "true" : false,
+        sfxOn: legSfxOn ? legSfxOn === "true" : true,
+        musicVolume: legVol ? Math.max(0, Math.min(1, Number(legVol))) : 0.12,
+      };
+    }
+  } catch {}
+  return null;
+}
+
+function writeAudioSettings(s: AudioSettingsV1) {
+  try {
+    localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s));
+  } catch {}
+}
 
 export default function App() {
   const {
@@ -37,18 +76,40 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [battleShown, setBattleShown] = useState(false);
 
-  // Audio settings (per SettingsDialog)
-  const [musicOn, setMusicOn] = useState(false);
-  const [sfxOn, setSfxOn] = useState(true);
-  const [musicVolume, setMusicVolume] = useState(0.12);
-
   const synth = useSynth();
+  const ambience = useAmbience();
+
+  const [musicOn, setMusicOn] = useState<boolean>(false);
+  const [sfxOn, setSfxOn] = useState<boolean>(true);
+  const [musicVolume, setMusicVolume] = useState<number>(0.12);
+
+  useEffect(() => {
+    ambience.setMode?.("pulse");
+  }, [ambience]);
+
+  useEffect(() => {
+    const s = readAudioSettings();
+    if (!s) return;
+    setMusicOn(!!s.musicOn);
+    setSfxOn(!!s.sfxOn);
+    setMusicVolume(typeof s.musicVolume === "number" ? s.musicVolume : 0.12);
+  }, []);
+
+  useEffect(() => {
+    writeAudioSettings({ schemaVersion: 1, musicOn, sfxOn, musicVolume });
+  }, [musicOn, sfxOn, musicVolume]);
+
+  useEffect(() => {
+    ambience.setEnabled(musicOn);
+  }, [musicOn, ambience]);
+
+  useEffect(() => {
+    ambience.setVolume(musicVolume);
+  }, [musicVolume, ambience]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
   const playerFolded =
-    started &&
-    (enemyThinking || awaitNextRound || matchOver) &&
-    playerChoice !== null;
+    started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
 
   const battleAnim = useMemo(() => {
     if (lastRound?.outcome === "PLAYER") return "animate-hk-win";
@@ -58,7 +119,8 @@ export default function App() {
   }, [lastRound?.outcome]);
 
   const startMatch = (rounds: number) => {
-    synth.arm();
+    if (musicOn) ambience.arm();
+    if (sfxOn) synth.arm();
     resetMatch();
     setTargetWins(rounds);
     setStarted(true);
@@ -71,37 +133,37 @@ export default function App() {
 
   useEffect(() => {
     const out = lastRound?.outcome;
-    if (!out || !sfxOn) return;
+    if (!out) return;
+    if (!sfxOn) return;
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
-  }, [lastRound?.outcome, sfxOn, synth]);
+  }, [lastRound?.outcome, sfxOn]);
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
-        <p className="text-(--hawkins-muted) mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
-
+        <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
-            <img
-              src={UI_ART.GEAR.src}
-              alt={UI_ART.GEAR.alt}
-              className="w-8 h-8 md:w-10 md:h-10"
-              draggable={false}
-            />
+            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-8 h-8 md:w-10 md:h-10" draggable={false} />
           </IconButton>
         </div>
-
         <SettingsDialog
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
           musicOn={musicOn}
           sfxOn={sfxOn}
           musicVolume={musicVolume}
-          onToggleMusic={(v) => setMusicOn(v)}
-          onToggleSfx={(v) => setSfxOn(v)}
+          onToggleMusic={(v) => {
+            setMusicOn(v);
+            if (v) ambience.arm();
+          }}
+          onToggleSfx={(v) => {
+            setSfxOn(v);
+            if (v) synth.arm();
+          }}
           onChangeMusicVolume={(v) => setMusicVolume(v)}
         />
       </header>
@@ -129,7 +191,10 @@ export default function App() {
                         aspect={ART[symbol].aspect}
                         onSelect={() => {
                           if (!battleShown) setBattleShown(true);
-                          if (sfxOn) synth.select();
+                          if (sfxOn) {
+                            try { synth.arm(); } catch {}
+                            synth.select();
+                          }
                           onPick(symbol);
                         }}
                         className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
@@ -149,13 +214,7 @@ export default function App() {
               subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
               className={battleAnim}
             >
-              <ControlsBar
-                targetWins={targetWins}
-                disabledSelect={true}
-                onChangeTarget={setTargetWins}
-                showTarget={false}
-              />
-
+              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={setTargetWins} showTarget={false} />
               <BattleDuel
                 player={started ? playerChoice : null}
                 enemy={started ? enemyChoice : null}
@@ -164,7 +223,6 @@ export default function App() {
                 thinking={started && enemyThinking}
                 progress={enemyProgress}
               />
-
               <div className="mt-4">
                 <BattleView
                   narration={started ? (lastRound?.narration ?? null) : null}
@@ -187,7 +245,6 @@ export default function App() {
       </div>
 
       <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
-
       <EndOverlay
         open={matchOver}
         winnerText={winnerText}
