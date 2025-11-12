@@ -14,7 +14,6 @@ import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
-import { useAmbience } from "./hooks/useAmbience";
 
 export default function App() {
   const {
@@ -30,7 +29,6 @@ export default function App() {
       winnerText,
       enemyThinking,
       enemyProgress,
-      enemyRevealAt,
     },
     actions: { setTargetWins, onPick, resetMatch },
   } = useGameController();
@@ -39,27 +37,18 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [battleShown, setBattleShown] = useState(false);
 
+  // Audio settings (per SettingsDialog)
   const [musicOn, setMusicOn] = useState(false);
   const [sfxOn, setSfxOn] = useState(true);
-  const [musicVolume, setMusicVolume] = useState(0.25);
+  const [musicVolume, setMusicVolume] = useState(0.12);
 
   const synth = useSynth();
-  const ambience = useAmbience();
-
-  useEffect(() => {
-    synth.setEnabledSfx(sfxOn);
-  }, [sfxOn, synth]);
-
-  useEffect(() => {
-    ambience.setEnabled(musicOn);
-  }, [musicOn, ambience]);
-
-  useEffect(() => {
-    ambience.setVolume(musicVolume);
-  }, [musicVolume, ambience]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
-  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
+  const playerFolded =
+    started &&
+    (enemyThinking || awaitNextRound || matchOver) &&
+    playerChoice !== null;
 
   const battleAnim = useMemo(() => {
     if (lastRound?.outcome === "PLAYER") return "animate-hk-win";
@@ -70,7 +59,6 @@ export default function App() {
 
   const startMatch = (rounds: number) => {
     synth.arm();
-    ambience.setEnabled(false);
     resetMatch();
     setTargetWins(rounds);
     setStarted(true);
@@ -83,11 +71,11 @@ export default function App() {
 
   useEffect(() => {
     const out = lastRound?.outcome;
-    if (!out) return;
+    if (!out || !sfxOn) return;
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
-  }, [lastRound?.outcome, synth]);
+  }, [lastRound?.outcome, sfxOn, synth]);
 
   return (
     <main className="min-h-screen px-6 sm:px-10 py-8 space-y-6">
@@ -97,7 +85,12 @@ export default function App() {
 
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
-            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-8 h-8 md:w-10 md:h-10" draggable={false} />
+            <img
+              src={UI_ART.GEAR.src}
+              alt={UI_ART.GEAR.alt}
+              className="w-8 h-8 md:w-10 md:h-10"
+              draggable={false}
+            />
           </IconButton>
         </div>
 
@@ -107,9 +100,9 @@ export default function App() {
           musicOn={musicOn}
           sfxOn={sfxOn}
           musicVolume={musicVolume}
-          onToggleMusic={setMusicOn}
-          onToggleSfx={setSfxOn}
-          onChangeMusicVolume={setMusicVolume}
+          onToggleMusic={(v) => setMusicOn(v)}
+          onToggleSfx={(v) => setSfxOn(v)}
+          onChangeMusicVolume={(v) => setMusicVolume(v)}
         />
       </header>
 
@@ -136,6 +129,7 @@ export default function App() {
                         aspect={ART[symbol].aspect}
                         onSelect={() => {
                           if (!battleShown) setBattleShown(true);
+                          if (sfxOn) synth.select();
                           onPick(symbol);
                         }}
                         className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
@@ -155,7 +149,12 @@ export default function App() {
               subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
               className={battleAnim}
             >
-              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={setTargetWins} showTarget={false} />
+              <ControlsBar
+                targetWins={targetWins}
+                disabledSelect={true}
+                onChangeTarget={setTargetWins}
+                showTarget={false}
+              />
 
               <BattleDuel
                 player={started ? playerChoice : null}
@@ -164,7 +163,6 @@ export default function App() {
                 locked={awaitNextRound}
                 thinking={started && enemyThinking}
                 progress={enemyProgress}
-                enemyRevealAt={enemyRevealAt}
               />
 
               <div className="mt-4">

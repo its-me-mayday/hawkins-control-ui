@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import { ART } from "../assets/art";
 
@@ -10,7 +11,7 @@ type Props = {
   locked?: boolean;
   thinking?: boolean;
   progress?: number;
-  enemyRevealAt?: number | null;
+  enemyRevealed?: boolean;
 };
 
 function ProgressCard({ label, progress = 0 }: { label: string; progress?: number }) {
@@ -40,14 +41,16 @@ function DuelCard({
   outcome,
   locked,
   align = "left",
-  portalKey,
+  portal = false,
+  jitter = false,
 }: {
   who: "PLAYER" | "ENEMY";
   symbol?: HawkinsSymbol | null;
   outcome?: Outcome;
   locked?: boolean;
   align?: "left" | "right";
-  portalKey?: number | null;
+  portal?: boolean;
+  jitter?: boolean;
 }) {
   if (!symbol) {
     return (
@@ -60,10 +63,8 @@ function DuelCard({
   }
 
   const art = ART[symbol];
-  const showWin =
-    locked && ((who === "PLAYER" && outcome === "PLAYER") || (who === "ENEMY" && outcome === "ENEMY"));
-  const showLose =
-    locked && ((who === "PLAYER" && outcome === "ENEMY") || (who === "ENEMY" && outcome === "PLAYER"));
+  const showWin  = locked && ((who === "PLAYER" && outcome === "PLAYER") || (who === "ENEMY" && outcome === "ENEMY"));
+  const showLose = locked && ((who === "PLAYER" && outcome === "ENEMY")  || (who === "ENEMY" && outcome === "PLAYER"));
   const src = showWin && art.win ? art.win : showLose && art.lose ? art.lose : art.src;
 
   const anim =
@@ -76,18 +77,23 @@ function DuelCard({
       : "";
 
   const accent =
-    symbol === "ELEVEN" ? "var(--accent-eleven)" : symbol === "DEMOGORGON" ? "var(--accent-demog)" : "var(--accent-lab)";
-
-  const portalClass = who === "ENEMY" ? "hk-portal" : "";
+    symbol === "ELEVEN" ? "var(--accent-eleven)" :
+    symbol === "DEMOGORGON" ? "var(--accent-demog)" :
+    "var(--accent-lab)";
 
   return (
     <div className="flex justify-center">
       <div
-        key={portalKey ?? undefined}
-        className={["hk-card overflow-hidden w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[220px]", anim, portalClass].join(
-          " "
-        )}
-        style={{ borderColor: `${accent}55`, boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A` }}
+        className={[
+          "hk-card overflow-hidden w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[220px]",
+          anim,
+          portal ? "hk-portal" : "",
+          jitter ? "hk-crt-jitter" : "",
+        ].join(" ")}
+        style={{
+          borderColor: `${accent}55`,
+          boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
+        }}
       >
         <div className="relative w-full overflow-hidden rounded-lg grid place-items-center">
           <div className="h-[140px] sm:h-[160px] lg:h-[180px] w-full relative">
@@ -105,6 +111,7 @@ function DuelCard({
             />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.12),transparent_30%,transparent_70%,rgba(0,0,0,.18))]" />
             <div className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 24px rgba(0,0,0,.25)" }} />
+            {portal && <div className="hk-portal-bloom pointer-events-none absolute inset-0" />}
           </div>
         </div>
 
@@ -125,8 +132,16 @@ export default function BattleDuel({
   locked = false,
   thinking = false,
   progress = 0,
-  enemyRevealAt = null,
+  enemyRevealed = false,
 }: Props) {
+  const lastRevealRef = useRef(0);
+  const portal = enemyRevealed && Date.now() - lastRevealRef.current < 600;
+  const jitter = portal;
+
+  useEffect(() => {
+    if (enemyRevealed) lastRevealRef.current = Date.now();
+  }, [enemyRevealed]);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-5">
       <DuelCard who="PLAYER" symbol={player ?? null} outcome={outcome} locked={locked} align="left" />
@@ -143,7 +158,8 @@ export default function BattleDuel({
             outcome={outcome}
             locked={locked}
             align="right"
-            portalKey={enemyRevealAt ?? undefined}
+            portal={portal}
+            jitter={jitter}
           />
         )}
       </div>
