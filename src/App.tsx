@@ -1,4 +1,3 @@
-// src/App.tsx
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import BattleView from "./sections/BattleView";
@@ -13,7 +12,7 @@ import StatsPanel from "./components/StatsPanel";
 import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
 
 export default function App() {
@@ -36,28 +35,32 @@ export default function App() {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [started, setStarted] = useState(false);
-
-  // NEW: Battle visibile solo dopo la prima scelta
   const [battleShown, setBattleShown] = useState(false);
-
-  // Synth (audio)
   const synth = useSynth();
+
+  const disablePlay = !started || awaitNextRound || matchOver;
+  const playerFolded =
+    started &&
+    (enemyThinking || awaitNextRound || matchOver) &&
+    playerChoice !== null;
+
+  const battleAnim = useMemo(() => {
+    if (lastRound?.outcome === "PLAYER") return "animate-hk-win";
+    if (lastRound?.outcome === "ENEMY") return "animate-hk-lose";
+    if (lastRound?.outcome === "DRAW") return "animate-hk-draw";
+    return "";
+  }, [lastRound?.outcome]);
 
   const startMatch = (rounds: number) => {
     synth.arm();
     resetMatch();
     setTargetWins(rounds);
     setStarted(true);
-    setBattleShown(false); // nascondi Battle finché non scegli la prima carta
+    setBattleShown(false);
   };
 
-  const disablePlay = !started || awaitNextRound || matchOver;
-  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver);
-
   useEffect(() => {
-    if (started && !matchOver && !playerChoice && !enemyChoice) {
-      setBattleShown(false);
-    }
+    if (started && !matchOver && !playerChoice && !enemyChoice) setBattleShown(false);
   }, [started, matchOver, playerChoice, enemyChoice]);
 
   useEffect(() => {
@@ -73,18 +76,11 @@ export default function App() {
       <header className="text-center mb-8 relative pr-16 sm:pr-24">
         <h1 className="hk-title animate-hk-flash text-4xl sm:text-5xl">Hawkins Control</h1>
         <p className="text-[color:var(--hawkins-muted)] mt-2">Eleven vs Demogorgon vs Hawkins Lab</p>
-
         <div className="absolute right-0 top-0">
           <IconButton label="Open settings" onClick={() => setSettingsOpen(true)}>
-            <img
-              src={UI_ART.GEAR.src}
-              alt={UI_ART.GEAR.alt}
-              className="w-8 h-8 md:w-10 md:h-10"
-              draggable={false}
-            />
+            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-8 h-8 md:w-10 md:h-10" draggable={false} />
           </IconButton>
         </div>
-
         <SettingsDialog
           open={settingsOpen}
           targetWins={targetWins}
@@ -94,17 +90,11 @@ export default function App() {
       </header>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-6 items-start">
-        {/* COLONNA SINISTRA — Player PRIMA, poi (se mostrata) Battle */}
         <div className="space-y-6 min-w-0">
-          {/* PLAYER (foldabile) */}
           <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
             <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
               <div className="relative">
-                <div
-                  className={`grid grid-cols-3 gap-5 mt-2 ${
-                    disablePlay ? "opacity-60 pointer-events-none" : ""
-                  }`}
-                >
+                <div className={`grid grid-cols-3 gap-5 mt-2 ${disablePlay ? "opacity-60 pointer-events-none" : ""}`}>
                   {HAWKINS_SYMBOLS.map((symbol: HawkinsSymbol) => (
                     <div key={symbol} className="flex justify-center">
                       <StrangerCard
@@ -121,7 +111,7 @@ export default function App() {
                         useLoseImage={awaitNextRound && playerChoice === symbol && lastRound?.outcome === "ENEMY"}
                         aspect={ART[symbol].aspect}
                         onSelect={() => {
-                          if (!battleShown) setBattleShown(true); // mostra solo durante questo round
+                          if (!battleShown) setBattleShown(true);
                           onPick(symbol);
                         }}
                         className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
@@ -134,29 +124,14 @@ export default function App() {
             </GameArea>
           </div>
 
-          {/* BATTLE — visibile solo dopo la prima scelta */}
           {battleShown && (
             <GameArea
               variant="battle"
               title="Battle"
               subtitle={started ? "Fate is decided in the neon flicker." : "Set rounds and start the match."}
-              className={
-                lastRound?.outcome === "PLAYER"
-                  ? "animate-hk-win"
-                  : lastRound?.outcome === "ENEMY"
-                  ? "animate-hk-lose"
-                  : lastRound?.outcome === "DRAW"
-                  ? "animate-hk-draw"
-                  : ""
-              }
+              className={battleAnim}
             >
-              <ControlsBar
-                targetWins={targetWins}
-                disabledSelect={true}
-                onChangeTarget={setTargetWins}
-                showTarget={false}
-              />
-
+              <ControlsBar targetWins={targetWins} disabledSelect={true} onChangeTarget={setTargetWins} showTarget={false} />
               <BattleDuel
                 player={started ? playerChoice : null}
                 enemy={started ? enemyChoice : null}
@@ -165,7 +140,6 @@ export default function App() {
                 thinking={started && enemyThinking}
                 progress={enemyProgress}
               />
-
               <div className="mt-4">
                 <BattleView
                   narration={started ? (lastRound?.narration ?? null) : null}
@@ -176,7 +150,6 @@ export default function App() {
           )}
         </div>
 
-        {/* COLONNA DESTRA — SOLO stats */}
         <div className="space-y-6 mt-6 lg:mt-0">
           <StatsPanel
             wins={scoreboard.wins}
@@ -188,17 +161,14 @@ export default function App() {
         </div>
       </div>
 
-      {/* OVERLAY START */}
       <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
-
-      {/* OVERLAY FINE MATCH */}
       <EndOverlay
         open={matchOver}
         winnerText={winnerText}
         onNewMatch={() => {
           resetMatch();
           setStarted(false);
-          setBattleShown(false); // nascondi di nuovo la Battle per il nuovo match
+          setBattleShown(false);
         }}
       />
     </main>

@@ -1,7 +1,5 @@
-// src/hooks/useGameController.ts
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  HAWKINS_SYMBOLS,
   judgeRound,
   getRandomSymbol,
   applyRoundToScoreboard,
@@ -12,7 +10,6 @@ import {
 } from "@its-me-mayday/hawkins-control";
 
 const STORAGE_KEY = "hawkins-control:v1";
-
 type MatchScore = { player: number; enemy: number };
 
 export function useGameController() {
@@ -32,34 +29,24 @@ export function useGameController() {
   const roundUnlockRef = useRef<number | null>(null);
 
   const matchOver = match.player >= targetWins || match.enemy >= targetWins;
-  const winnerText = matchOver
-    ? match.player >= targetWins
-      ? "YOU WON THE MATCH"
-      : "ENEMY WON THE MATCH"
-    : null;
+  const winnerText = matchOver ? (match.player >= targetWins ? "YOU WON THE MATCH" : "ENEMY WON THE MATCH") : null;
 
-  // Persist
   useEffect(() => {
     const payload = { targetWins, match, scoreboard };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
   }, [targetWins, match, scoreboard]);
 
-  // Restore
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.targetWins) setTargetWins(parsed.targetWins);
-        if (parsed?.match) setMatch(parsed.match);
-        if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
-      }
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed?.targetWins) setTargetWins(parsed.targetWins);
+      if (parsed?.match) setMatch(parsed.match);
+      if (parsed?.scoreboard) setScoreboard(parsed.scoreboard);
     } catch {}
   }, []);
 
-  // Cleanup timers
   useEffect(() => {
     return () => {
       if (thinkTimerRef.current) window.clearTimeout(thinkTimerRef.current);
@@ -90,8 +77,7 @@ export function useGameController() {
     if (matchOver || awaitNextRound || enemyThinking) return;
 
     setPlayerChoice(choice);
-    // Enemy "thinking" 0–5s con progress bar
-    const totalMs = Math.floor(Math.random() * 5001); // 0..5000
+    const totalMs = Math.floor(Math.random() * 5001);
     setEnemyThinking(true);
     setEnemyProgress(0);
 
@@ -122,15 +108,11 @@ export function useGameController() {
         return m;
       });
 
-      // Lock sempre (PLAYER / ENEMY / DRAW), poi auto-unlock dopo 3s
       setAwaitNextRound(true);
 
       roundUnlockRef.current = window.setTimeout(() => {
         setAwaitNextRound(false);
-        // Se il match è finito, non azzeriamo il round finché l’utente non fa New Match (overlay)
-        if (!matchOver) {
-          resetRound();
-        }
+        if (!matchOver) resetRound();
       }, 3000);
     }, totalMs);
   };
@@ -149,11 +131,6 @@ export function useGameController() {
       enemyThinking,
       enemyProgress,
     },
-    actions: {
-      setTargetWins,
-      onPick,
-      nextRound: () => {}, // non utilizzato con auto-unlock, lasciato per compatibilità
-      resetMatch,
-    },
+    actions: { setTargetWins, onPick, nextRound: () => {}, resetMatch },
   };
 }

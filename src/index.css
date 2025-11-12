@@ -268,3 +268,7 @@ body{
   overflow: hidden;
   pointer-events: none;
 }
+
+.hk-fold { overflow: hidden; transition: max-height .35s ease, opacity .2s ease; }
+.hk-fold--open { max-height: 1000px; opacity: 1; }
+.hk-fold--collapsed { max-height: 0; opacity: 0; pointer-events: none; }

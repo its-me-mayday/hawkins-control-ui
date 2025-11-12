@@ -1,7 +1,6 @@
 import React from "react";
 
 type AreaVariant = "player" | "enemy" | "battle";
-
 type AreaProps = {
   variant?: AreaVariant;
   title?: string;
@@ -28,12 +27,8 @@ export default function GameArea({
   accent,
 }: AreaProps) {
   const accentValue = accent ?? VARIANT_ACCENT[variant];
-
   return (
-    <section
-      className={["hk-panel", className].filter(Boolean).join(" ")}
-      style={{ ["--accent" as any]: accentValue }}
-    >
+    <section className={["hk-panel", className].filter(Boolean).join(" ")} style={{ ["--accent" as any]: accentValue }}>
       {(title || subtitle) && (
         <header
           className={[
@@ -42,23 +37,12 @@ export default function GameArea({
             headerAlign === "left" && "text-left",
             headerAlign === "center" && "text-center",
             headerAlign === "right" && "text-right",
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          ].filter(Boolean).join(" ")}
         >
-          {title && (
-            <h2 className="hk-title text-base text-(--accent)">
-              {title}
-            </h2>
-          )}
-          {subtitle && (
-            <p className="mt-1 text-xs text-(--hawkins-muted) uppercase tracking-widest">
-              {subtitle}
-            </p>
-          )}
+          {title && <h2 className="hk-title text-base text-(--accent)">{title}</h2>}
+          {subtitle && <p className="mt-1 text-xs text-(--hawkins-muted) uppercase tracking-widest">{subtitle}</p>}
         </header>
       )}
-
       <div>{children}</div>
     </section>
   );

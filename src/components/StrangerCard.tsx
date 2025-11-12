@@ -1,7 +1,7 @@
+// src/components/StrangerCard.tsx
 import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 
 type Outcome = "PLAYER" | "ENEMY" | "DRAW";
-
 type StrangerCardProps = {
   label: HawkinsSymbol;
   selected?: boolean;
@@ -46,22 +46,12 @@ export default function StrangerCard({
   const accent = ACCENT_BY_SYMBOL[label];
 
   const outcomeAnim =
-    selected && outcomeForSelected === "PLAYER"
-      ? "animate-card-win"
-      : selected && outcomeForSelected === "ENEMY"
-      ? "animate-card-lose"
-      : selected && outcomeForSelected === "DRAW"
-      ? "animate-card-draw"
-      : "";
+    selected && outcomeForSelected === "PLAYER" ? "animate-card-win" :
+    selected && outcomeForSelected === "ENEMY" ? "animate-card-lose" :
+    selected && outcomeForSelected === "DRAW" ? "animate-card-draw" : "";
 
   const imgGlitch = selected && outcomeForSelected === "ENEMY" ? "hk-img-glitch" : "";
-  const effectiveSrc =
-    useWinImage && imageWinSrc
-      ? imageWinSrc
-      : useLoseImage && imageLoseSrc
-      ? imageLoseSrc
-      : imageSrc;
-
+  const effectiveSrc = useWinImage && imageWinSrc ? imageWinSrc : useLoseImage && imageLoseSrc ? imageLoseSrc : imageSrc;
   const loseTone = selected && outcomeForSelected === "ENEMY" ? "saturate-[.85]" : "";
 
   return (
@@ -74,17 +64,11 @@ export default function StrangerCard({
         outcomeAnim,
         className,
       ].join(" ")}
-      style={{
-        borderColor: `${accent}55`,
-        boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A`,
-      }}
+      style={{ borderColor: `${accent}55`, boxShadow: `0 0 16px ${accent}33, inset 0 0 18px ${accent}1A` }}
     >
       <div
         className={`relative w-full overflow-hidden rounded-lg aspect-[${aspect}]`}
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.35)), radial-gradient(60% 50% at 50% 0%, rgba(255,255,255,.06), transparent 60%)",
-        }}
+        style={{ background: "linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.35)), radial-gradient(60% 50% at 50% 0%, rgba(255,255,255,.06), transparent 60%)" }}
       >
         {imageSrc ? (
           <img
@@ -100,26 +84,18 @@ export default function StrangerCard({
             style={{ objectPosition: imagePosition }}
           />
         ) : (
-          <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">
-            No image
-          </div>
+          <div className="h-full w-full grid place-items-center text-[color:var(--hawkins-muted)]">No image</div>
         )}
         {imageFit === "contain" && (
           <>
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.12),transparent_30%,transparent_70%,rgba(0,0,0,.18))]" />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{ boxShadow: "inset 0 0 24px rgba(0,0,0,.25)" }}
-            />
+            <div className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 24px rgba(0,0,0,.25)" }} />
           </>
         )}
       </div>
 
       <div className="mt-3 text-center uppercase tracking-widest">
-        <span
-          className={titleSize === "sm" ? "text-xs sm:text-sm" : "text-sm sm:text-base"}
-          style={{ color: accent }}
-        >
+        <span className={titleSize === "sm" ? "text-xs sm:text-sm" : "text-sm sm:text-base"} style={{ color: accent }}>
           {label.replace("_", " ")}
         </span>
       </div>
