@@ -4,9 +4,35 @@ import "./index.css";
 import GameArea from "./sections/GameArea";
 import EnemyView from "./sections/EnemyView";
 import BattleView from "./sections/BattleView";
-import { useState } from "react";
+import { useRef, useState } from "react";
+
+function useSynth() {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const ensureCtx = () => (ctxRef.current ??= new (window.AudioContext || (window as any).webkitAudioContext)());
+
+  const tone = (freq: number, dur = 0.15, type: OscillatorType = "sine", gain = 0.06) => {
+    const ctx = ensureCtx();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    g.gain.value = gain;
+    osc.connect(g).connect(ctx.destination);
+    const now = ctx.currentTime;
+    osc.start(now);
+    osc.stop(now + dur);
+  };
+
+  const click = () => tone(2200, 0.05, "square", 0.03);
+  const win = () => { tone(880, 0.12, "sawtooth", 0.06); setTimeout(() => tone(1320, 0.12, "sawtooth", 0.05), 90); };
+  const lose = () => tone(220, 0.18, "triangle", 0.07);
+  const draw = () => tone(600, 0.1, "sine", 0.04);
+
+  return { click, win, lose, draw };
+}
 
 export default function App() {
+  const synth = useSynth();
   const [playerChoice, setPlayerChoice] = useState<HawkinsSymbol | null>(null);
   const [enemyChoice, setEnemyChoice] = useState<HawkinsSymbol | null>(null);
   const [lastRound, setLastRound] = useState<RoundResult | null>(null);
@@ -18,12 +44,18 @@ export default function App() {
       if (btn) { btn.classList.add("animate-hk-press"); setTimeout(() => btn.classList.remove("animate-hk-press"), 160); }
     });
     
+    synth.click();
+    
     setPlayerChoice(choice);
     const enemy = getRandomSymbol();
     setEnemyChoice(enemy);
     const round = judgeRound(choice, enemy);
     setLastRound(round);
     setScoreboard((prev) => applyRoundToScoreboard(prev, round));
+    
+    if (round.outcome === "PLAYER") synth.win();
+    else if (round.outcome === "ENEMY") synth.lose();
+    else synth.draw();
   };
 
   return (
