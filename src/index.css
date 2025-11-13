@@ -655,3 +655,273 @@ body {
     transform: translateY(0);
   }
 }
+
+.hk-burger {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(15, 23, 42, 0.9);
+}
+
+.hk-burger::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(248, 113, 113, 0.22), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.24), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hk-burger::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 113, 113, 0.7);
+  box-shadow:
+    0 0 8px rgba(248, 113, 113, 0.9),
+    0 0 16px rgba(56, 189, 248, 0.7);
+  background:
+    radial-gradient(circle, transparent 50%, rgba(15, 23, 42, 0.95) 90%);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.22s ease-out,
+    transform 0.22s ease-out;
+  pointer-events: none;
+}
+
+.hk-burger-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+  z-index: 1;
+}
+
+.hk-burger-line {
+  width: 1.1rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #f97373, #38bdf8);
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.8);
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.16s ease-out,
+    box-shadow 0.2s ease-out,
+    width 0.2s ease-out;
+  transform-origin: 10% 50%;
+}
+
+.hk-burger-line--top {
+  animation: hk-burger-flicker 2s infinite ease-in-out;
+}
+
+.hk-burger-line--middle {
+  animation: hk-burger-flicker 2.3s infinite ease-in-out;
+}
+
+.hk-burger-line--bottom {
+  animation: hk-burger-flicker 2.6s infinite ease-in-out;
+}
+
+.hk-burger--open::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hk-burger--open .hk-burger-line--top {
+  transform: translateY(5px) rotate(40deg);
+  width: 0.9rem;
+  box-shadow: 0 0 14px rgba(248, 113, 113, 1);
+}
+
+.hk-burger--open .hk-burger-line--middle {
+  transform: rotate(90deg) scaleX(0.75);
+  box-shadow: 0 0 16px rgba(248, 250, 252, 0.9);
+}
+
+.hk-burger--open .hk-burger-line--bottom {
+  transform: translateY(-5px) rotate(-40deg);
+  width: 0.9rem;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 1);
+}
+
+@keyframes hk-burger-flicker {
+  0% {
+    opacity: 0.7;
+  }
+  35% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.35;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+.hk-burger {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(15, 23, 42, 0.9);
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+}
+
+.hk-burger::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(248, 113, 113, 0.22), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.24), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hk-burger::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 113, 113, 0.7);
+  box-shadow:
+    0 0 8px rgba(248, 113, 113, 0.9),
+    0 0 16px rgba(56, 189, 248, 0.7);
+  background:
+    radial-gradient(circle, transparent 48%, rgba(15, 23, 42, 0.98) 95%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity 0.22s ease-out,
+    transform 0.22s ease-out;
+  pointer-events: none;
+}
+
+.hk-burger-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  z-index: 1;
+}
+
+.hk-burger-line {
+  width: 1.1rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #f97373, #38bdf8);
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.8);
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.16s ease-out,
+    box-shadow 0.2s ease-out,
+    width 0.2s ease-out;
+}
+
+.hk-burger-line--top {
+  animation: hk-burger-flicker 2.1s infinite ease-in-out;
+}
+
+.hk-burger-line--middle {
+  animation: hk-burger-flicker 2.4s infinite ease-in-out;
+}
+
+.hk-burger-line--bottom {
+  animation: hk-burger-flicker 2.7s infinite ease-in-out;
+}
+
+.hk-burger--open {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 18px rgba(248, 113, 113, 0.85),
+    0 0 30px rgba(15, 23, 42, 1);
+}
+
+.hk-burger--open::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hk-burger--open .hk-burger-line--top {
+  transform: translateY(6px) rotate(38deg);
+  width: 1.05rem;
+  box-shadow: 0 0 14px rgba(248, 113, 113, 1);
+}
+
+.hk-burger--open .hk-burger-line--middle {
+  opacity: 0;
+  transform: scaleX(0.4);
+}
+
+.hk-burger--open .hk-burger-line--bottom {
+  transform: translateY(-6px) rotate(-38deg);
+  width: 1.05rem;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 1);
+}
+
+@keyframes hk-burger-flicker {
+  0% {
+    opacity: 0.7;
+  }
+  30% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.3;
+  }
+  55% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+/* hero-based portal colors */
+
+.hk-burger--joyce::after {
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow:
+    0 0 10px rgba(248, 113, 113, 1),
+    0 0 22px rgba(248, 113, 113, 0.9);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(248, 113, 113, 0.4), transparent 60%),
+    radial-gradient(circle, transparent 50%, rgba(15, 23, 42, 0.98) 95%);
+}
+
+.hk-burger--dustin::after {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow:
+    0 0 10px rgba(56, 189, 248, 1),
+    0 0 22px rgba(30, 64, 175, 0.9);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.4), transparent 60%),
+    radial-gradient(circle, transparent 50%, rgba(15, 23, 42, 0.98) 95%);
+}
+
+.hk-burger--hopper::after {
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow:
+    0 0 10px rgba(248, 113, 113, 1),
+    0 0 22px rgba(56, 189, 248, 0.9);
+  background:
+    radial-gradient(circle at 30% 40%, rgba(248, 113, 113, 0.45), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(56, 189, 248, 0.45), transparent 60%),
+    radial-gradient(circle, transparent 50%, rgba(15, 23, 42, 0.98) 95%);
+}
+
+.hk-burger--mike::after {
+  border-color: rgba(34, 197, 94, 0.9);
+  box-shadow:
+    0 0 10px rgba(34, 197, 94, 1),
+    0 0 22px rgba(21, 128, 61, 0.9);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(34, 197, 94, 0.4), transparent 60%),
+    radial-gradient(circle, transparent 50%, rgba(15, 23, 42, 0.98) 95%);
+}

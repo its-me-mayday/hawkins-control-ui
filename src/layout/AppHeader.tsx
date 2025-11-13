@@ -25,6 +25,7 @@ export default function AppHeader({
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const heroAccent = getHeroAccent(heroId);
+  const burgerHeroClass = getHeroBurgerClass(heroId);
 
   const handleOpenStats = () => {
     onOpenStats();
@@ -84,13 +85,21 @@ export default function AppHeader({
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-slate-950/90 hover:border-rose-400 hover:shadow-[0_0_16px_rgba(248,113,113,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className={[
+              "hk-burger inline-flex h-9 w-9 items-center justify-center rounded-full border bg-slate-950/90 border-slate-700",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+              burgerHeroClass,
+              menuOpen ? "hk-burger--open" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             aria-label="Open menu"
+            aria-expanded={menuOpen}
           >
-            <span className="flex flex-col gap-0.5">
-              <span className="h-[2px] w-4 rounded-full bg-slate-100" />
-              <span className="h-[2px] w-4 rounded-full bg-slate-300" />
-              <span className="h-[2px] w-4 rounded-full bg-slate-100" />
+            <span className="hk-burger-inner">
+              <span className="hk-burger-line hk-burger-line--top" />
+              <span className="hk-burger-line hk-burger-line--middle" />
+              <span className="hk-burger-line hk-burger-line--bottom" />
             </span>
           </button>
 
@@ -195,4 +204,12 @@ function getHeroAccent(heroId: HeroKey) {
   }
 
   return null;
+}
+
+function getHeroBurgerClass(heroId: HeroKey) {
+  if (heroId === "JOYCE") return "hk-burger--joyce";
+  if (heroId === "DUSTIN") return "hk-burger--dustin";
+  if (heroId === "HOPPER") return "hk-burger--hopper";
+  if (heroId === "MIKE") return "hk-burger--mike";
+  return "";
 }
