@@ -234,8 +234,8 @@ export default function App() {
                               playerChoice === symbol ? lastRound?.outcome ?? null : null
                             }
                             imageSrc={ART[symbol].src}
-                            imageWinSrc={ART[symbol].win}
-                            imageLoseSrc={ART[symbol].lose}
+                            imageWinSrc={ART[symbol].win ?? ART[symbol].src}
+                            imageLoseSrc={ART[symbol].lose ?? ART[symbol].src}
                             imageAlt={ART[symbol].alt}
                             imageFit={ART[symbol].fit}
                             imagePosition={ART[symbol].pos}
