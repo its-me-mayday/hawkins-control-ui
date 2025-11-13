@@ -1,14 +1,53 @@
-type Props = { open: boolean; winnerText: string | null; onNewMatch: () => void };
+type Props = {
+  open: boolean;
+  winnerText: string | null | undefined;
+  onNewMatch: () => void;
+};
 
 export default function EndOverlay({ open, winnerText, onNewMatch }: Props) {
   if (!open) return null;
+
+  const playerWon = winnerText?.toLowerCase().includes("you");
+  const title = playerWon ? "Match Victory" : "Match Over";
+  const tag = playerWon ? "You bent the odds." : "The Upside Down fought back.";
+  const badgeText = playerWon ? "Hawkins Champion" : "Hawkins Survivor";
+
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0" style={{ background: "radial-gradient(90% 60% at 50% 40%, rgba(0,0,0,0.40), rgba(0,0,0,0.75) 38%, rgba(0,0,0,1) 68%)" }} />
-      <div className="relative w-full max-w-md rounded-2xl p-6 border text-center" style={{ background: "var(--hawkins-bg)", borderColor: "rgba(255,17,51,0.35)", boxShadow: "0 8px 26px rgba(0,0,0,.55), 0 0 22px rgba(255,17,51,.12)" }}>
-        <h2 className="hk-title text-xl mb-2">Match Over</h2>
-        <p className="text-(--hawkins-muted) text-sm mb-4 uppercase tracking-widest">{winnerText ?? "The match has ended"}</p>
-        <button className="hk-btn hk-btn--danger hk-btn--shine" onClick={onNewMatch}>New Match</button>
+    <div className="fixed inset-0 z-40 flex items-center justify-center px-4 sm:px-6">
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" />
+      <div className="relative z-50 w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/95 shadow-[0_0_60px_rgba(15,23,42,1)] px-4 py-5 sm:px-5 sm:py-6">
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="inline-flex items-center rounded-full border border-rose-500/70 bg-slate-950/90 px-3 py-1 text-[0.7rem] uppercase tracking-[0.22em] text-rose-200 shadow-[0_0_26px_rgba(248,113,113,0.9)]">
+            <span className="mr-1.5 inline-flex h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+            {badgeText}
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-[0.24em] uppercase text-slate-50">
+            {title}
+          </h2>
+
+          <p className="text-[0.75rem] sm:text-sm text-slate-300 leading-snug max-w-sm">
+            {winnerText || "The neon hums as this match comes to an end."}
+          </p>
+
+          <p className="text-[0.7rem] text-slate-400 uppercase tracking-[0.18em]">
+            {tag}
+          </p>
+
+          <div className="mt-3 flex flex-col sm:flex-row items-center justify-center gap-2 w-full">
+            <button
+              type="button"
+              onClick={onNewMatch}
+              className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-rose-500/80 bg-rose-600/90 px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.22em] text-slate-50 shadow-[0_0_26px_rgba(248,113,113,0.9)] hover:bg-rose-500 hover:border-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            >
+              Start new match
+            </button>
+          </div>
+
+          <div className="mt-2 text-[0.65rem] text-slate-500 leading-snug">
+            <p>Change rounds or keep the same rules and dive into another Hawkins experiment.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
