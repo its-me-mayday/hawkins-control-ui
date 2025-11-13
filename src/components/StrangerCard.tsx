@@ -5,8 +5,8 @@ type Props = {
   selected: boolean;
   outcomeForSelected: Outcome;
   imageSrc: string;
-  imageWinSrc: string;
-  imageLoseSrc: string;
+  imageWinSrc?: string;
+  imageLoseSrc?: string;
   imageAlt: string;
   imageFit?: string;
   imagePosition?: string;
@@ -36,8 +36,11 @@ export default function StrangerCard({
   titleSize = "md",
 }: Props) {
   let src = imageSrc;
-  if (useWinImage) src = imageWinSrc;
-  else if (useLoseImage) src = imageLoseSrc;
+  if (useWinImage && imageWinSrc) {
+    src = imageWinSrc;
+  } else if (useLoseImage && imageLoseSrc) {
+    src = imageLoseSrc;
+  }
 
   const baseBorder = "border-slate-700/80";
   const selectedBorder = "border-rose-500/80";
@@ -65,13 +68,16 @@ export default function StrangerCard({
       : "shadow-none";
 
   const titleSizeClass =
-    titleSize === "sm"
-      ? "text-xs sm:text-sm"
-      : "text-sm sm:text-base";
+    titleSize === "sm" ? "text-xs sm:text-sm" : "text-sm sm:text-base";
 
   const aspectClass = aspect || "aspect-[4/5]";
   const fitClass = imageFit || "object-contain";
   const posClass = imagePosition || "object-center";
+
+  let statusLabel = "Ready";
+  if (outcomeForSelected === "PLAYER") statusLabel = "Round win";
+  else if (outcomeForSelected === "ENEMY") statusLabel = "Round loss";
+  else if (outcomeForSelected === "DRAW") statusLabel = "Round draw";
 
   return (
     <button
@@ -95,7 +101,9 @@ export default function StrangerCard({
           )}
         </div>
 
-        <div className={`relative w-full ${aspectClass} overflow-hidden rounded-xl bg-slate-900/80`}>
+        <div
+          className={`relative w-full ${aspectClass} overflow-hidden rounded-xl bg-slate-900/80`}
+        >
           <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity bg-[radial-gradient(circle_at_top,_#f97316_0,_transparent_55%),radial-gradient(circle_at_bottom,_#22d3ee_0,_transparent_55%)]" />
           <img
             src={src}
@@ -106,12 +114,7 @@ export default function StrangerCard({
         </div>
 
         <div className="mt-1.5 flex items-center justify-between text-[0.65rem] text-slate-400 uppercase tracking-[0.16em]">
-          <span>
-            {outcomeForSelected === "PLAYER" && "Round win"}
-            {outcomeForSelected === "ENEMY" && "Round loss"}
-            {outcomeForSelected === "DRAW" && "Round draw"}
-            {!outcomeForSelected && "Ready"}
-          </span>
+          <span>{statusLabel}</span>
           <span className="opacity-70">Stranger Card</span>
         </div>
       </div>

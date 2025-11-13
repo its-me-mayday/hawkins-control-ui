@@ -9,7 +9,9 @@ export default function EndOverlay({ open, winnerText, onNewMatch }: Props) {
 
   const playerWon = winnerText?.toLowerCase().includes("you");
   const title = playerWon ? "Match Victory" : "Match Over";
-  const tag = playerWon ? "You bent the odds." : "The Upside Down fought back.";
+  const tag = playerWon
+    ? "Tonight, Hawkins was on your side."
+    : "The board falls quiet, but Hawkins never sleeps.";
   const badgeText = playerWon ? "Hawkins Champion" : "Hawkins Survivor";
 
   return (
@@ -27,7 +29,7 @@ export default function EndOverlay({ open, winnerText, onNewMatch }: Props) {
           </h2>
 
           <p className="text-[0.75rem] sm:text-sm text-slate-300 leading-snug max-w-sm">
-            {winnerText || "The neon hums as this match comes to an end."}
+            {winnerText || "The neon hums softly as this Hawkins experiment comes to an end."}
           </p>
 
           <p className="text-[0.7rem] text-slate-400 uppercase tracking-[0.18em]">
@@ -45,7 +47,10 @@ export default function EndOverlay({ open, winnerText, onNewMatch }: Props) {
           </div>
 
           <div className="mt-2 text-[0.65rem] text-slate-500 leading-snug">
-            <p>Change rounds or keep the same rules and dive into another Hawkins experiment.</p>
+            <p>
+              Tune the rounds, reshuffle your instincts and see if Hawkins tells a different story
+              next time.
+            </p>
           </div>
         </div>
       </div>

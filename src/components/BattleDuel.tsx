@@ -54,11 +54,11 @@ export default function BattleDuel({
             </div>
 
             <div className="mt-2 text-[0.7rem] text-slate-300 text-center min-h-[1.4rem]">
-              {draw && "Draw"}
-              {playerWins && "You win this round"}
-              {enemyWins && "You lose this round"}
-              {!outcome && !player && !enemy && "Choose your card to begin"}
-              {!outcome && player && !enemy && "Enemy is preparing a move"}
+              {draw && "Stalemate in the flicker."}
+              {playerWins && "You tilt Hawkins in your favor."}
+              {enemyWins && "The shadows push back this round."}
+              {!outcome && !player && !enemy && "Choose your card to light up the board."}
+              {!outcome && player && !enemy && "The enemy is reading the Upside Down currents."}
             </div>
           </div>
 
@@ -78,16 +78,16 @@ export default function BattleDuel({
           <p className="text-xs sm:text-sm text-slate-300 leading-snug">
             {narration ||
               (outcome === "PLAYER" &&
-                "Your choice bends the Upside Down to your will.") ||
+                "Like a perfect roll at the D&D table, your play cuts through the dark of Hawkins.") ||
               (outcome === "ENEMY" &&
-                "The shadows close in as the enemy strikes back.") ||
+                "The neon dips and the air chills as the enemy’s move echoes from the Upside Down.") ||
               (outcome === "DRAW" &&
-                "Energy crackles in the air, but the balance holds.") ||
+                "Christmas lights tremble along the walls, but neither side breaks the tension.") ||
               (!player && !enemy &&
-                "Pick your Stranger Things symbol and let the neon decide your fate.") ||
+                "Pick your Stranger Things symbol and let the board decide if you are with the kids or the monsters.") ||
               (player && !enemy &&
-                "You made your move. The enemy is reading the currents of the Upside Down.") ||
-              "The neon hums while the next clash takes shape."}
+                "Your card is set. Somewhere beyond the veil, the Demogorgon smiles or shivers.") ||
+              "For a moment, Hawkins holds its breath, waiting for the next clash."}
           </p>
         </div>
       </div>
@@ -185,7 +185,7 @@ function DuelSide({
       </div>
 
       {label === "Enemy" && (
-        <div className="mt-2 w-full min-h-6">
+        <div className="mt-2 w-full min-h-[1.5rem]">
           {thinking && !symbol ? (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-end gap-2 text-[0.7rem] text-slate-400">

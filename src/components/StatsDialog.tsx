@@ -25,11 +25,17 @@ export default function StatsDialog({
   const drawRate = rounds ? Math.round((draws / rounds) * 100) : 0;
 
   const scoreDiff = playerScore - enemyScore;
-  let momentum = "Perfect balance in the neon haze.";
-  if (scoreDiff > 2) momentum = "You are in control of the board.";
-  else if (scoreDiff > 0) momentum = "The Upside Down tilts in your favor.";
-  else if (scoreDiff < -2) momentum = "The enemy is running the show.";
-  else if (scoreDiff < 0) momentum = "The enemy has a slight edge.";
+  let momentum = "Hawkins hangs in a fragile balance of flashlights and fear.";
+  if (scoreDiff > 2) {
+    momentum = "You are running this match like the Party at the D&D table.";
+  } else if (scoreDiff > 0) {
+    momentum = "The kids would say the odds are leaning your way.";
+  } else if (scoreDiff < -2) {
+    momentum = "Right now it feels like the Demogorgon is calling the shots.";
+  } else if (scoreDiff < 0) {
+    momentum = "The enemy has a small lead, but Hawkins has seen comebacks before.";
+
+  }
 
   const winBarWidth = Math.min(100, Math.max(0, winRate));
   const restBarWidth = 100 - winBarWidth;
@@ -137,30 +143,36 @@ export default function StatsDialog({
           <div className="grid grid-cols-2 gap-2.5">
             <MiniCard
               label="Neon trend"
-              value={scoreDiff > 0 ? "+ " + scoreDiff : scoreDiff < 0 ? scoreDiff : "Even"}
+              value={
+                scoreDiff > 0
+                  ? "+ " + scoreDiff
+                  : scoreDiff < 0
+                  ? scoreDiff
+                  : "Even"
+              }
               hint={
                 scoreDiff > 0
-                  ? "You are leading this match."
+                  ? "Feels like the Party is one step ahead of the Demogorgon."
                   : scoreDiff < 0
-                  ? "The enemy is slightly ahead."
-                  : "Locked in a perfect standoff."
+                  ? "The enemy is nudging Hawkins toward the dark, but nothing is set in stone."
+                  : "Like bikes in the night, both sides ride side by side."
               }
             />
             <MiniCard
               label="Round flavor"
               value={
                 winRate >= 60
-                  ? "Bold streak"
+                  ? "On a hot streak"
                   : winRate <= 35
-                  ? "Against the odds"
-                  : "Neck and neck"
+                  ? "Against the dark"
+                  : "Balanced chaos"
               }
               hint={
                 winRate >= 60
-                  ? "The Upside Down seems to like your choices."
+                  ? "Right now your plays look as sharp as Nancy with a plan."
                   : winRate <= 35
-                  ? "Perfect time for a comeback arc."
-                  : "Every choice matters in this balance."
+                  ? "More like wandering the woods with a flickering flashlight, but the story is not over."
+                  : "This feels like a real Hawkins night: messy, tense and up for grabs."
               }
             />
           </div>

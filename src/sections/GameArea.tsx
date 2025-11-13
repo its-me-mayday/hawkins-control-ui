@@ -19,11 +19,19 @@ export default function GameArea({
 
   const accentRing = isPlayer
     ? "border-rose-500/40 shadow-[0_0_26px_rgba(248,113,113,0.55)]"
-    : "border-sky-500/40 shadow-[0_0_26px_rgba(56,189,248,0.55)]";
+    : "border-sky-500/35 shadow-[0_0_18px_rgba(56,189,248,0.45)]";
+
+  const padding = isPlayer
+    ? "px-3 py-3 sm:px-4 sm:py-4"
+    : "px-3 py-2 sm:px-3.5 sm:py-3";
+
+  const width = isPlayer ? "" : "max-w-2xl mx-auto";
 
   return (
     <section
-      className={`rounded-2xl border bg-slate-950/80 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-sm ${accentRing} ${className ?? ""}`}
+      className={`rounded-2xl border bg-slate-950/80 backdrop-blur-sm ${accentRing} ${padding} ${width} ${
+        className ?? ""
+      }`}
     >
       <header className="mb-2 flex items-baseline justify-between gap-2">
         <div>
