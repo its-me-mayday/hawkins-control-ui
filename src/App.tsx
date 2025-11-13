@@ -88,7 +88,8 @@ export default function App() {
   }, [musicVolume, ambience]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
-  const playerFolded = started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
+  const playerFolded =
+    started && (enemyThinking || awaitNextRound || matchOver) && playerChoice !== null;
 
   const battleAnim = useMemo(() => {
     if (lastRound?.outcome === "PLAYER") return "animate-hk-win";
@@ -119,7 +120,12 @@ export default function App() {
   }, [lastRound?.outcome, sfxOn]);
 
   if (showHome) {
-    return <StartScreen onEnter={() => setShowHome(false)} logoSrc={UI_ART.ICON.src} />;
+    return (
+      <StartScreen
+        onEnter={() => setShowHome(false)}
+        logoSrc={UI_ART.ICON.src}
+      />
+    );
   }
 
   return (
@@ -203,7 +209,11 @@ export default function App() {
 
           <div className="flex-1">
             <div className="space-y-6 min-w-0">
-              <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
+              <div
+                className={
+                  playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"
+                }
+              >
                 <GameArea
                   variant="player"
                   title="Player"
@@ -290,6 +300,20 @@ export default function App() {
               )}
             </div>
           </div>
+
+          <footer className="mt-2 border-t border-slate-800 pt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[0.7rem] text-slate-400">
+            <div className="flex items-center gap-2">
+              <span className="uppercase tracking-[0.18em] text-slate-500">
+                Tip
+              </span>
+              <span>
+                Eleven beats Demogorgon, Demogorgon beats Hawkins Lab, Hawkins Lab beats Eleven.
+              </span>
+            </div>
+            <span className="uppercase tracking-[0.16em] text-slate-500">
+              Hawkins Control · Season 1
+            </span>
+          </footer>
 
           <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
           <EndOverlay
