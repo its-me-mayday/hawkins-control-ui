@@ -2,6 +2,7 @@ import eleven from "./characters/eleven.png";
 import dustin from "./characters/dustin.png";
 import hopper from "./characters/hopper.png";
 import mike from "./characters/mike.png";
+import joyce from "./characters/joyce.png";
 import demogorgon from "./characters/demogorgon.png";
 import lab from "./characters/hawkins-lab.png";
 import elevenwin from "./characters/eleven-win.png";
@@ -29,6 +30,7 @@ export const UI_ART = {
     DUSTIN: { src: dustin, alt: "dustin" },
     HOPPER: { src: hopper, alt: "hopper" },
     MIKE: { src: mike, alt: "mike" },
+    JOYCE: { src: joyce, alt: "joyce" },
   }
 
 export const ART: Record<

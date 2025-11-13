@@ -15,4 +15,8 @@ export const HERO_META: Record<HeroKey, { name: string; role: string }> = {
     name: "Mike Wheeler",
     role: "Party Leader",
   },
+  JOYCE: {
+    name: "Joyce Byers",
+    role: "Christmas Lights Oracle",
+  },
 };

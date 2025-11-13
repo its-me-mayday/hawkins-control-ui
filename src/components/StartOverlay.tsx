@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { HEROES } from "../assets/art";
-
-type HeroKey = keyof typeof HEROES;
+import type { HeroKey } from "../constants/heroes";
 
 type Props = {
   open: boolean;
@@ -28,6 +27,11 @@ const HERO_INFO: Record<HeroKey, { name: string; role: string; short: string }> 
     name: "Mike Wheeler",
     role: "Party Leader",
     short: "Leads like a late-night campaign.",
+  },
+  JOYCE: {
+    name: "Joyce Byers",
+    role: "Christmas Lights Oracle",
+    short: "Follows every flicker until the pattern makes sense.",
   },
 };
 

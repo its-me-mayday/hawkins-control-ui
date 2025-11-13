@@ -1,13 +1,13 @@
 import { UI_ART } from "../assets/art";
+import type { HeroKey } from "../constants/heroes";
 
 type Result = "PLAYER" | "ENEMY" | "DRAW" | null;
-type HeroId = "DUSTIN" | "HOPPER" | "MIKE";
 
 type Props = {
   open: boolean;
   winnerText: string | null;
   result: Result;
-  heroId?: HeroId;
+  heroId?: HeroKey;
   heroName?: string;
   onNewMatch: () => void;
 };
@@ -62,6 +62,8 @@ export default function EndOverlay({
       heroLine = ` ${heroName} grinds through the noise and keeps Hawkins standing on sheer stubborn will.`;
     } else if (heroId === "MIKE") {
       heroLine = ` ${heroName} keeps the party together long enough to flip the board in your favor.`;
+    } else if (heroId === "JOYCE") {
+      heroLine = ` ${heroName} reads every flicker of the lights until the board finally tilts your way.`;
     }
   } else if (isEnemyWin && heroId && heroName) {
     if (heroId === "DUSTIN") {
@@ -70,6 +72,8 @@ export default function EndOverlay({
       heroLine = ` Not even ${heroName}'s temper and badge can fully keep the dark out this time.`;
     } else if (heroId === "MIKE") {
       heroLine = ` The party follows ${heroName}, but tonight Hawkins slips a little closer to the other side.`;
+    } else if (heroId === "JOYCE") {
+      heroLine = ` ${heroName} stares at the wall of lights, but the message from the other side is louder this time.`;
     }
   } else if (isDraw && heroName) {
     heroLine = ` ${heroName} buys you time, but the next match will decide which side the town wakes up on.`;
