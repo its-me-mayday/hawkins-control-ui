@@ -20,21 +20,18 @@ const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
 
 type HeroKey = keyof typeof HEROES;
 
-const HERO_META: Record<HeroKey, { name: string; role: string; tagline: string }> = {
+const HERO_META: Record<HeroKey, { name: string; role: string }> = {
   DUSTIN: {
     name: "Dustin Henderson",
-    role: "Tactician · Brains of the Party",
-    tagline: "Plays the odds like a D&D rules lawyer.",
+    role: "Brains of the Party",
   },
   HOPPER: {
     name: "Jim Hopper",
-    role: "Chief · Reluctant Guardian",
-    tagline: "Takes hits, kicks doors, never stops pushing.",
+    role: "Hawkins Chief",
   },
   MIKE: {
     name: "Mike Wheeler",
-    role: "Heart · Party Leader",
-    tagline: "Leads like it is another late-night campaign.",
+    role: "Party Leader",
   },
 };
 
@@ -158,16 +155,51 @@ export default function App() {
       <div className="relative flex min-h-screen flex-col">
         <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex flex-col gap-0.5">
-              <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase">
-                Hawkins Control
-              </h1>
-              <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
-                Season 1 · First to {targetWins} wins
-              </p>
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="flex flex-col gap-0.5">
+                <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase truncate">
+                  Hawkins Control
+                </h1>
+                <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
+                  Season 1 · First to {targetWins} wins
+                </p>
+              </div>
+
+              <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/80 px-2.5 py-1">
+                <div className="h-7 w-7 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
+                  <img
+                    src={heroArt.src}
+                    alt={heroArt.alt}
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                  />
+                </div>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-slate-500">
+                    You
+                  </span>
+                  <span className="text-[0.7rem] font-semibold text-slate-100 truncate max-w-[7rem]">
+                    {heroMeta.name}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex sm:hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5">
+                <div className="h-6 w-6 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
+                  <img
+                    src={heroArt.src}
+                    alt={heroArt.alt}
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                  />
+                </div>
+                <span className="text-[0.6rem] font-medium text-slate-100 max-w-[6rem] truncate">
+                  {heroMeta.name}
+                </span>
+              </div>
+
               <IconButton
                 label="Open stats"
                 onClick={() => setStatsOpen(true)}
@@ -240,27 +272,9 @@ export default function App() {
               >
                 <GameArea
                   variant="player"
-                  title={heroMeta.name}
+                  title="Player"
                   subtitle={started ? "Choose your side" : "Tune the experiment and start"}
                 >
-                  <div className="mb-2 flex items-center gap-3">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
-                      <img
-                        src={heroArt.src}
-                        alt={heroArt.alt}
-                        className="h-full w-full object-cover"
-                        draggable={false}
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[0.7rem] uppercase tracking-[0.22em] text-slate-400">
-                        {heroMeta.role}
-                      </span>
-                      <span className="text-[0.7rem] text-slate-300">
-                        {heroMeta.tagline}
-                      </span>
-                    </div>
-                  </div>
                   <div className="relative">
                     <div
                       className={`grid grid-cols-3 gap-5 mt-2 ${
