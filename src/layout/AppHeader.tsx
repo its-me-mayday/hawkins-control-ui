@@ -45,7 +45,7 @@ export default function AppHeader({
             <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase truncate">
               Hawkins Control
             </h1>
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
               <p className="text-[0.7rem] uppercase tracking-[0.2em] text-slate-400">
                 Season 1 · First to {targetWins} wins
               </p>
@@ -55,7 +55,7 @@ export default function AppHeader({
 
           <div
             className={[
-              "hidden md:flex items-center gap-2 rounded-full border bg-slate-950/80 px-2.5 py-1 transition-all",
+              "hidden lg:flex items-center gap-2 rounded-full border bg-slate-950/80 px-2.5 py-1 transition-all",
               "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
               heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
             ]
@@ -85,7 +85,7 @@ export default function AppHeader({
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="inline-flex md:hidden h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-slate-950/90 hover:border-rose-400 hover:shadow-[0_0_16px_rgba(248,113,113,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className="inline-flex lg:hidden h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-slate-950/90 hover:border-rose-400 hover:shadow-[0_0_16px_rgba(248,113,113,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             aria-label="Open menu"
           >
             <span className="flex flex-col gap-0.5">
@@ -99,7 +99,7 @@ export default function AppHeader({
             label="Open stats"
             onClick={handleOpenStats}
             title="Stats"
-            className="relative hidden md:inline-flex w-9 h-9 md:w-10 md:h-10 rounded-full border border-rose-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(248,113,113,0.7)] hover:border-rose-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className="relative hidden lg:inline-flex w-9 h-9 md:w-10 md:h-10 rounded-full border border-rose-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(248,113,113,0.7)] hover:border-rose-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
           >
             <img
               src={UI_ART.STATS.src}
@@ -113,7 +113,7 @@ export default function AppHeader({
             label="Open settings"
             onClick={handleOpenSettings}
             title="Settings"
-            className="relative hidden md:inline-flex w-9 h-9 md:w-10 md:h-10 rounded-full border border-sky-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(56,189,248,0.7)] hover:border-sky-400 hover:shadow-[0_0_22px_rgba(56,189,248,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className="relative hidden lg:inline-flex w-9 h-9 md:w-10 md:h-10 rounded-full border border-sky-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(56,189,248,0.7)] hover:border-sky-400 hover:shadow-[0_0_22px_rgba(56,189,248,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
           >
             <img
               src={UI_ART.GEAR.src}
@@ -124,7 +124,7 @@ export default function AppHeader({
           </IconButton>
 
           {menuOpen && (
-            <div className="absolute right-0 top-11 z-20 w-48 rounded-2xl border border-slate-800 bg-slate-950/98 shadow-[0_12px_40px_rgba(15,23,42,0.9)] py-2 md:hidden">
+            <div className="absolute right-0 top-11 z-20 w-52 rounded-2xl border border-slate-800 bg-slate-950/98 shadow-[0_12px_40px_rgba(15,23,42,0.9)] py-2 lg:hidden">
               <div className="flex items-center gap-2 px-3 pb-2 border-b border-slate-800">
                 <div className="h-7 w-7 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
                   <img
