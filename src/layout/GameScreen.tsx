@@ -144,7 +144,7 @@ export default function GameScreen({
             >
               <div className="relative">
                 <div
-                  className={`grid grid-cols-3 gap-2 sm:gap-5 mt-1 sm:mt-2 justify-items-center ${
+                  className={`grid grid-cols-3 gap-1.5 sm:gap-5 mt-1 sm:mt-2 justify-items-center ${
                     disablePlay ? "opacity-60 pointer-events-none" : ""
                   }`}
                 >
@@ -174,7 +174,7 @@ export default function GameScreen({
                         }
                         aspect={ART[symbol].aspect}
                         onSelect={() => onSelectCard(symbol)}
-                        className="w-full max-w-[100px] sm:max-w-[150px] lg:max-w-[190px]"
+                        className="w-full max-w-[88px] sm:max-w-[150px] lg:max-w-[190px]"
                         titleSize="sm"
                       />
                     </div>
