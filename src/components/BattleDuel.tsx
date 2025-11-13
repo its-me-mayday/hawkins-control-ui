@@ -40,6 +40,7 @@ export default function BattleDuel({
             highlight={playerWins}
             faded={!!outcome && !playerWins && !draw}
             alignment="left"
+            outcome={outcome}
           />
 
           <div className="flex flex-col items-center justify-center px-1 sm:px-2 min-w-[90px]">
@@ -69,6 +70,7 @@ export default function BattleDuel({
             alignment="right"
             thinking={thinking && !enemy && !!player}
             progress={progress}
+            outcome={outcome}
           />
         </div>
 
@@ -101,6 +103,7 @@ type DuelSideProps = {
   alignment: "left" | "right";
   thinking?: boolean;
   progress?: number;
+  outcome: Outcome;
 };
 
 function DuelSide({
@@ -111,6 +114,7 @@ function DuelSide({
   alignment,
   thinking = false,
   progress = 0,
+  outcome,
 }: DuelSideProps) {
   const art = symbol ? ART[symbol] : null;
 
@@ -128,6 +132,17 @@ function DuelSide({
     (label === "You"
       ? ("No card yet" as HawkinsSymbol | string)
       : ("Hidden" as HawkinsSymbol | string));
+
+  let imageSrc: string | undefined = art?.src;
+  if (art && symbol && outcome) {
+    if (label === "You") {
+      if (outcome === "PLAYER") imageSrc = art.win;
+      else if (outcome === "ENEMY") imageSrc = art.lose;
+    } else if (label === "Enemy") {
+      if (outcome === "ENEMY") imageSrc = art.win;
+      else if (outcome === "PLAYER") imageSrc = art.lose;
+    }
+  }
 
   return (
     <div
@@ -151,11 +166,11 @@ function DuelSide({
       </div>
 
       <div className="flex-1 flex items-center justify-center w-full">
-        {art ? (
+        {imageSrc ? (
           <div className="relative w-full max-w-[130px] sm:max-w-[150px] md:max-w-[170px] aspect-[4/5] overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-900/80">
             <img
-              src={art.src}
-              alt={art.alt}
+              src={imageSrc}
+              alt={art?.alt ?? ""}
               className="h-full w-full object-contain"
               draggable={false}
             />
@@ -170,7 +185,7 @@ function DuelSide({
       </div>
 
       {label === "Enemy" && (
-        <div className="mt-2 w-full min-h-6">
+        <div className="mt-2 w-full min-h-[1.5rem]">
           {thinking && !symbol ? (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-end gap-2 text-[0.7rem] text-slate-400">
