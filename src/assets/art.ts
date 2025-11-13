@@ -1,4 +1,7 @@
 import eleven from "./eleven.png";
+import dustin from "./dustin.png";
+import hopper from "./hopper.png";
+import mike from "./mike.png";
 import demogorgon from "./demogorgon.png";
 import lab from "./hawkins-lab.png";
 import elevenwin from "./eleven-win.png";
@@ -16,6 +19,12 @@ export const UI_ART = {
   GEAR: { src: gear, alt: "Settings" },
   ICON: { src: icon, alt: "Icon" },
   STATS: { src: stats, alt: "Stats" } };
+
+  export const HEROES = {
+    DUSTIN: { src: dustin, alt: "dustin" },
+    HOPPER: { src: hopper, alt: "hopper" },
+    MIKE: { src: mike, alt: "mike" },
+  }
 
 export const ART: Record<
   HawkinsSymbol,

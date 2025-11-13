@@ -1,7 +1,7 @@
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import StrangerCard from "./components/StrangerCard";
-import { ART, UI_ART } from "./assets/art";
+import { ART, UI_ART, HEROES } from "./assets/art";
 import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import { useGameController } from "./hooks/useGameController";
 import IconButton from "./components/IconButton";
@@ -17,6 +17,26 @@ import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
 
 const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
+
+type HeroKey = keyof typeof HEROES;
+
+const HERO_META: Record<HeroKey, { name: string; role: string; tagline: string }> = {
+  DUSTIN: {
+    name: "Dustin Henderson",
+    role: "Tactician · Brains of the Party",
+    tagline: "Plays the odds like a D&D rules lawyer.",
+  },
+  HOPPER: {
+    name: "Jim Hopper",
+    role: "Chief · Reluctant Guardian",
+    tagline: "Takes hits, kicks doors, never stops pushing.",
+  },
+  MIKE: {
+    name: "Mike Wheeler",
+    role: "Heart · Party Leader",
+    tagline: "Leads like it is another late-night campaign.",
+  },
+};
 
 function readAudioSettings() {
   try {
@@ -57,6 +77,8 @@ export default function App() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [started, setStarted] = useState(false);
   const [battleShown, setBattleShown] = useState(false);
+
+  const [hero, setHero] = useState<HeroKey>("DUSTIN");
 
   const synth = useSynth();
   const ambience = useAmbience();
@@ -117,6 +139,9 @@ export default function App() {
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
   }, [lastRound?.outcome, sfxOn]);
+
+  const heroMeta = HERO_META[hero];
+  const heroArt = HEROES[hero];
 
   if (showHome) {
     return (
@@ -215,9 +240,27 @@ export default function App() {
               >
                 <GameArea
                   variant="player"
-                  title="Player"
+                  title={heroMeta.name}
                   subtitle={started ? "Choose your side" : "Tune the experiment and start"}
                 >
+                  <div className="mb-2 flex items-center gap-3">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
+                      <img
+                        src={heroArt.src}
+                        alt={heroArt.alt}
+                        className="h-full w-full object-cover"
+                        draggable={false}
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[0.7rem] uppercase tracking-[0.22em] text-slate-400">
+                        {heroMeta.role}
+                      </span>
+                      <span className="text-[0.7rem] text-slate-300">
+                        {heroMeta.tagline}
+                      </span>
+                    </div>
+                  </div>
                   <div className="relative">
                     <div
                       className={`grid grid-cols-3 gap-5 mt-2 ${
@@ -308,7 +351,13 @@ export default function App() {
             </span>
           </footer>
 
-          <StartOverlay open={!started} defaultTarget={targetWins} onStart={startMatch} />
+          <StartOverlay
+            open={!started}
+            defaultTarget={targetWins}
+            hero={hero}
+            onChangeHero={setHero}
+            onStart={startMatch}
+          />
           <EndOverlay
             open={matchOver}
             winnerText={winnerText}
