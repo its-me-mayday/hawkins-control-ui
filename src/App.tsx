@@ -1,7 +1,6 @@
 import "./index.css";
 import GameArea from "./sections/GameArea";
 import StrangerCard from "./components/StrangerCard";
-import ControlsBar from "./components/ControlsBar";
 import { ART, UI_ART } from "./assets/art";
 import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import { useGameController } from "./hooks/useGameController";
