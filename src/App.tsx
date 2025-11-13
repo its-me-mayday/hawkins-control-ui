@@ -1,23 +1,14 @@
 import "./index.css";
-import GameArea from "./sections/GameArea";
-import StrangerCard from "./components/StrangerCard";
-import { ART, UI_ART, HEROES } from "./assets/art";
-import { HAWKINS_SYMBOLS, type HawkinsSymbol } from "@its-me-mayday/hawkins-control";
-import { useGameController } from "./hooks/useGameController";
-import SettingsDialog from "./components/SettingsDialog";
-import BattleDuel from "./components/BattleDuel";
-import StartOverlay from "./components/StartOverlay";
-import EndOverlay from "./components/EndOverlay";
-import StatsDialog from "./components/StatsDialog";
-import MatchBadge from "./components/MatchBadge";
+import { UI_ART, HEROES } from "./assets/art";
 import StartScreen from "./components/StartScreen";
+import { useGameController } from "./hooks/useGameController";
 import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
 import { HERO_META, type HeroKey } from "./constants/heroes";
 import { readAudioSettings, writeAudioSettings } from "./utils/audioSettings";
 import AppHeader from "./layout/AppHeader";
-import AppFooter from "./layout/AppFooter";
+import GameScreen from "./layout/GameScreen";
 
 export default function App() {
   const {
@@ -156,149 +147,67 @@ export default function App() {
           onOpenSettings={() => setSettingsOpen(true)}
         />
 
-        <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="flex justify-center">
-            <MatchBadge player={match.player} enemy={match.enemy} targetWins={targetWins} />
-          </div>
-
-          <SettingsDialog
-            open={settingsOpen}
-            onClose={() => setSettingsOpen(false)}
-            musicOn={musicOn}
-            sfxOn={sfxOn}
-            musicVolume={musicVolume}
-            onToggleMusic={(v) => {
-              setMusicOn(v);
-              if (v) ambience.arm();
-            }}
-            onToggleSfx={(v) => {
-              setSfxOn(v);
-              if (v) synth.arm();
-            }}
-            onChangeMusicVolume={(v) => setMusicVolume(v)}
-          />
-
-          <StatsDialog
-            open={statsOpen}
-            onClose={() => setStatsOpen(false)}
-            wins={scoreboard.wins}
-            losses={scoreboard.losses}
-            draws={scoreboard.draws}
-            playerScore={match.player}
-            enemyScore={match.enemy}
-            heroName={heroMeta.name}
-          />
-
-          <div className="flex-1">
-            <div className="space-y-6 min-w-0">
-              <div
-                className={
-                  playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"
-                }
-              >
-                <GameArea
-                  variant="player"
-                  title="Player"
-                  subtitle={started ? "Choose your side" : "Tune the experiment and start"}
-                >
-                  <div className="relative">
-                    <div
-                      className={`grid grid-cols-3 gap-5 mt-2 ${
-                        disablePlay ? "opacity-60 pointer-events-none" : ""
-                      }`}
-                    >
-                      {HAWKINS_SYMBOLS.map((symbol: HawkinsSymbol) => (
-                        <div key={symbol} className="flex justify-center">
-                          <StrangerCard
-                            label={symbol}
-                            selected={playerChoice === symbol}
-                            outcomeForSelected={
-                              playerChoice === symbol ? lastRound?.outcome ?? null : null
-                            }
-                            imageSrc={ART[symbol].src}
-                            imageWinSrc={ART[symbol].win ?? ART[symbol].src}
-                            imageLoseSrc={ART[symbol].lose ?? ART[symbol].src}
-                            imageAlt={ART[symbol].alt}
-                            imageFit={ART[symbol].fit}
-                            imagePosition={ART[symbol].pos}
-                            useWinImage={
-                              awaitNextRound &&
-                              playerChoice === symbol &&
-                              lastRound?.outcome === "PLAYER"
-                            }
-                            useLoseImage={
-                              awaitNextRound &&
-                              playerChoice === symbol &&
-                              lastRound?.outcome === "ENEMY"
-                            }
-                            aspect={ART[symbol].aspect}
-                            onSelect={() => {
-                              if (!battleShown) setBattleShown(true);
-                              if (sfxOn) {
-                                try {
-                                  synth.arm();
-                                } catch {}
-                                synth.select();
-                              }
-                              onPick(symbol);
-                            }}
-                            className="max-w-[150px] sm:max-w-[170px] lg:max-w-[190px]"
-                            titleSize="sm"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </GameArea>
-              </div>
-
-              {battleShown && (
-                <GameArea
-                  variant="battle"
-                  title="Battle"
-                  subtitle={
-                    started
-                      ? "Cards clash under Hawkins neon."
-                      : "Set rounds and start the experiment."
-                  }
-                  className={battleAnim}
-                >
-                  <BattleDuel
-                    player={started ? playerChoice : null}
-                    enemy={started ? enemyChoice : null}
-                    outcome={started ? lastRound?.outcome ?? null : null}
-                    narration={started ? lastRound?.narration ?? null : null}
-                    locked={awaitNextRound}
-                    thinking={started && enemyThinking}
-                    progress={enemyProgress}
-                  />
-                </GameArea>
-              )}
-            </div>
-          </div>
-
-          <AppFooter />
-
-          <StartOverlay
-            open={!started}
-            defaultTarget={targetWins}
-            hero={hero}
-            onChangeHero={setHero}
-            onStart={startMatch}
-          />
-          <EndOverlay
-            open={matchOver}
-            winnerText={winnerText}
-            result={matchResult}
-            heroId={hero}
-            heroName={heroMeta.name}
-            onNewMatch={() => {
-              resetMatch();
-              setStarted(false);
-              setBattleShown(false);
-            }}
-          />
-        </main>
+        <GameScreen
+          matchPlayer={match.player}
+          matchEnemy={match.enemy}
+          targetWins={targetWins}
+          settingsOpen={settingsOpen}
+          statsOpen={statsOpen}
+          onCloseSettings={() => setSettingsOpen(false)}
+          onCloseStats={() => setStatsOpen(false)}
+          musicOn={musicOn}
+          sfxOn={sfxOn}
+          musicVolume={musicVolume}
+          onToggleMusic={(value) => {
+            setMusicOn(value);
+            if (value) ambience.arm();
+          }}
+          onToggleSfx={(value) => {
+            setSfxOn(value);
+            if (value) synth.arm();
+          }}
+          onChangeMusicVolume={(value) => setMusicVolume(value)}
+          wins={scoreboard.wins}
+          losses={scoreboard.losses}
+          draws={scoreboard.draws}
+          started={started}
+          playerFolded={playerFolded}
+          disablePlay={disablePlay}
+          battleShown={battleShown}
+          battleAnim={battleAnim}
+          playerChoice={playerChoice}
+          enemyChoice={enemyChoice}
+          lastOutcome={lastRound?.outcome}
+          lastNarration={lastRound?.narration}
+          awaitNextRound={awaitNextRound}
+          enemyThinking={enemyThinking}
+          enemyProgress={enemyProgress}
+          onSelectCard={(symbol) => {
+            if (!battleShown) setBattleShown(true);
+            if (sfxOn) {
+              try {
+                synth.arm();
+              } catch {}
+              synth.select();
+            }
+            onPick(symbol);
+          }}
+          startOverlayOpen={!started}
+          startOverlayDefaultTarget={targetWins}
+          hero={hero}
+          onChangeHero={setHero}
+          onStartMatch={startMatch}
+          endOverlayOpen={matchOver}
+          winnerText={winnerText}
+          matchResult={matchResult}
+          heroName={heroMeta.name}
+          heroId={hero}
+          onNewMatch={() => {
+            resetMatch();
+            setStarted(false);
+            setBattleShown(false);
+          }}
+        />
       </div>
     </div>
   );
