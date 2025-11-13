@@ -23,7 +23,7 @@ export default function AppHeader({
   onOpenStats,
   onOpenSettings,
 }: Props) {
-  const isJoyce = heroId === "JOYCE";
+  const heroAccent = getHeroAccent(heroId);
 
   return (
     <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
@@ -37,17 +37,9 @@ export default function AppHeader({
               <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
                 Season 1 · First to {targetWins} wins
               </p>
-              {isJoyce && (
-                <div className="hidden sm:inline-flex items-center">
-                  <div className="hk-joyce-lights">
-                    <span className="hk-joyce-bulb hk-joyce-bulb--red" />
-                    <span className="hk-joyce-bulb hk-joyce-bulb--yellow" />
-                    <span className="hk-joyce-bulb hk-joyce-bulb--blue" />
-                    <span className="hk-joyce-bulb hk-joyce-bulb--green" />
-                    <span className="hk-joyce-bulb hk-joyce-bulb--pink" />
-                  </div>
-                </div>
-              )}
+              <div className="hidden sm:flex items-center">
+                {heroAccent}
+              </div>
             </div>
           </div>
 
@@ -133,4 +125,52 @@ export default function AppHeader({
       </div>
     </header>
   );
+}
+
+function getHeroAccent(heroId: HeroKey) {
+  if (heroId === "JOYCE") {
+    return (
+      <div className="hk-joyce-lights">
+        <span className="hk-joyce-bulb hk-joyce-bulb--red" />
+        <span className="hk-joyce-bulb hk-joyce-bulb--yellow" />
+        <span className="hk-joyce-bulb hk-joyce-bulb--blue" />
+        <span className="hk-joyce-bulb hk-joyce-bulb--green" />
+        <span className="hk-joyce-bulb hk-joyce-bulb--pink" />
+      </div>
+    );
+  }
+
+  if (heroId === "DUSTIN") {
+    return (
+      <div className="hk-dustin-dots">
+        <span className="hk-dustin-dot" />
+        <span className="hk-dustin-dot" />
+        <span className="hk-dustin-dot" />
+        <span className="hk-dustin-dot" />
+        <span className="hk-dustin-dot" />
+      </div>
+    );
+  }
+
+  if (heroId === "HOPPER") {
+    return (
+      <div className="hk-hopper-siren">
+        <span className="hk-hopper-siren-seg hk-hopper-siren-seg--red" />
+        <span className="hk-hopper-siren-seg hk-hopper-siren-seg--blue" />
+      </div>
+    );
+  }
+
+  if (heroId === "MIKE") {
+    return (
+      <div className="hk-mike-waves">
+        <span className="hk-mike-wave-bar" />
+        <span className="hk-mike-wave-bar" />
+        <span className="hk-mike-wave-bar" />
+        <span className="hk-mike-wave-bar" />
+      </div>
+    );
+  }
+
+  return null;
 }
