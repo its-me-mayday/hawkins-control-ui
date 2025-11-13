@@ -14,11 +14,16 @@ import type { HawkinsSymbol } from "@its-me-mayday/hawkins-control";
 import gear from "./gear.png";
 import icon from "./icon.png";
 import stats from "./stats.png";
+import hawkins from "./hawkins.png";
+import hawkinsUpside from "./hawkins-upside.png";
 
 export const UI_ART = { 
   GEAR: { src: gear, alt: "Settings" },
   ICON: { src: icon, alt: "Icon" },
-  STATS: { src: stats, alt: "Stats" } };
+  STATS: { src: stats, alt: "Stats" },
+  HAWKINS: { src: hawkins, alt: "Hawkins, Indiana" },
+  HAWKINS_UPSIDE: { src: hawkinsUpside, alt: "Hawkins, The Upside Down" },
+ };
 
   export const HEROES = {
     DUSTIN: { src: dustin, alt: "dustin" },

@@ -147,6 +147,15 @@ export default function App() {
   const heroMeta = HERO_META[hero];
   const heroArt = HEROES[hero];
 
+  const matchResult =
+    !matchOver
+      ? null
+      : match.player > match.enemy
+      ? "PLAYER"
+      : match.player < match.enemy
+      ? "ENEMY"
+      : "DRAW";
+
   if (showHome) {
     return (
       <StartScreen
@@ -176,7 +185,6 @@ export default function App() {
                 className={[
                   "hidden sm:flex items-center gap-2 rounded-full border bg-slate-950/80 px-2.5 py-1 transition-all",
                   "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
-                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -205,7 +213,6 @@ export default function App() {
                 className={[
                   "flex sm:hidden items-center gap-2 rounded-full border bg-slate-950/80 px-2 py-0.5 transition-all",
                   "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
-                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -399,6 +406,7 @@ export default function App() {
           <EndOverlay
             open={matchOver}
             winnerText={winnerText}
+            result={matchResult}
             onNewMatch={() => {
               resetMatch();
               setStarted(false);
