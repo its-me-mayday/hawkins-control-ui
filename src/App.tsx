@@ -76,6 +76,7 @@ export default function App() {
   const [battleShown, setBattleShown] = useState(false);
 
   const [hero, setHero] = useState<HeroKey>("DUSTIN");
+  const [heroJustChanged, setHeroJustChanged] = useState(false);
 
   const synth = useSynth();
   const ambience = useAmbience();
@@ -104,6 +105,12 @@ export default function App() {
   useEffect(() => {
     ambience.setVolume(musicVolume);
   }, [musicVolume, ambience]);
+
+  useEffect(() => {
+    setHeroJustChanged(true);
+    const t = setTimeout(() => setHeroJustChanged(false), 700);
+    return () => clearTimeout(t);
+  }, [hero]);
 
   const disablePlay = !started || awaitNextRound || matchOver;
   const playerFolded =
@@ -165,7 +172,15 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/80 px-2.5 py-1">
+              <div
+                className={[
+                  "hidden sm:flex items-center gap-2 rounded-full border bg-slate-950/80 px-2.5 py-1 transition-all",
+                  "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
+                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
                 <div className="h-7 w-7 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
                   <img
                     src={heroArt.src}
@@ -186,7 +201,15 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex sm:hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-950/80 px-2 py-0.5">
+              <div
+                className={[
+                  "flex sm:hidden items-center gap-2 rounded-full border bg-slate-950/80 px-2 py-0.5 transition-all",
+                  "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
+                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
                 <div className="h-6 w-6 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
                   <img
                     src={heroArt.src}
@@ -261,6 +284,7 @@ export default function App() {
             draws={scoreboard.draws}
             playerScore={match.player}
             enemyScore={match.enemy}
+            heroName={heroMeta.name}
           />
 
           <div className="flex-1">
