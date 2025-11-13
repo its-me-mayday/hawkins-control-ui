@@ -44,6 +44,7 @@ function readAudioSettings() {
   } catch {}
   return null;
 }
+
 function writeAudioSettings(s: any) {
   try {
     localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s));
@@ -96,12 +97,15 @@ export default function App() {
     setSfxOn(!!s.sfxOn);
     setMusicVolume(typeof s.musicVolume === "number" ? s.musicVolume : 0.12);
   }, []);
+
   useEffect(() => {
     writeAudioSettings({ schemaVersion: 1, musicOn, sfxOn, musicVolume });
   }, [musicOn, sfxOn, musicVolume]);
+
   useEffect(() => {
     ambience.setEnabled(musicOn);
   }, [musicOn, ambience]);
+
   useEffect(() => {
     ambience.setVolume(musicVolume);
   }, [musicVolume, ambience]);
@@ -142,7 +146,7 @@ export default function App() {
     if (out === "PLAYER") synth.win();
     else if (out === "ENEMY") synth.lose();
     else synth.draw();
-  }, [lastRound?.outcome, sfxOn]);
+  }, [lastRound?.outcome, sfxOn, synth]);
 
   const heroMeta = HERO_META[hero];
   const heroArt = HEROES[hero];
@@ -185,6 +189,7 @@ export default function App() {
                 className={[
                   "hidden sm:flex items-center gap-2 rounded-full border bg-slate-950/80 px-2.5 py-1 transition-all",
                   "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
+                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -213,6 +218,7 @@ export default function App() {
                 className={[
                   "flex sm:hidden items-center gap-2 rounded-full border bg-slate-950/80 px-2 py-0.5 transition-all",
                   "border-slate-700 hover:border-rose-400 hover:shadow-[0_0_18px_rgba(248,113,113,0.8)]",
+                  heroJustChanged ? "animate-pulse ring-1 ring-rose-500/70" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -407,6 +413,8 @@ export default function App() {
             open={matchOver}
             winnerText={winnerText}
             result={matchResult}
+            heroId={hero}
+            heroName={heroMeta.name}
             onNewMatch={() => {
               resetMatch();
               setStarted(false);

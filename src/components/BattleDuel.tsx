@@ -22,9 +22,23 @@ export default function BattleDuel({
   thinking,
   progress,
 }: Props) {
-  const playerWins = outcome === "PLAYER";
-  const enemyWins = outcome === "ENEMY";
-  const draw = outcome === "DRAW";
+  const isPlayerWin = outcome === "PLAYER";
+  const isEnemyWin = outcome === "ENEMY";
+  const isDraw = outcome === "DRAW";
+
+  const winnerSymbol: HawkinsSymbol | null =
+    isPlayerWin && player
+      ? player
+      : isEnemyWin && enemy
+      ? enemy
+      : null;
+
+  const winnerArt = winnerSymbol ? ART[winnerSymbol] : null;
+
+  let centerLabel = "Awaiting clash";
+  if (isPlayerWin) centerLabel = "You win the round";
+  else if (isEnemyWin) centerLabel = "Enemy wins the round";
+  else if (isDraw) centerLabel = "Neon standstill";
 
   return (
     <div
@@ -33,44 +47,54 @@ export default function BattleDuel({
       }`}
     >
       <div className="flex flex-col gap-4 sm:gap-5">
-        <div className="flex items-stretch gap-4 sm:gap-6">
-          <DuelSide
+        <div className="flex items-stretch gap-3 sm:gap-4">
+          <SideChoice
             label="You"
             symbol={player}
-            highlight={playerWins}
-            faded={!!outcome && !playerWins && !draw}
-            alignment="left"
             outcome={outcome}
+            side="PLAYER"
           />
 
-          <div className="flex flex-col items-center justify-center px-1 sm:px-2 min-w-[90px]">
-            <div className="text-xs uppercase tracking-[0.25em] text-slate-400 mb-1">
-              Round
-            </div>
-            <div className="flex items-center justify-center rounded-full border border-rose-500/60 bg-slate-950/80 px-5 py-1.5 shadow-[0_0_18px_rgba(248,113,113,0.7)]">
-              <span className="text-sm sm:text-base font-semibold tracking-[0.35em] uppercase">
-                VS
-              </span>
-            </div>
-
-            <div className="mt-2 text-[0.7rem] text-slate-300 text-center min-h-[1.4rem]">
-              {draw && "Stalemate in the flicker."}
-              {playerWins && "You tilt Hawkins in your favor."}
-              {enemyWins && "The shadows push back this round."}
-              {!outcome && !player && !enemy && "Choose your card to light up the board."}
-              {!outcome && player && !enemy && "The enemy is reading the Upside Down currents."}
+          <div className="flex flex-col items-center justify-center flex-1 gap-2 px-1 sm:px-2">
+            <span className="text-[0.7rem] uppercase tracking-[0.24em] text-slate-400">
+              Round result
+            </span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950/90 px-4 py-1.5 shadow-[0_0_18px_rgba(15,23,42,0.9)]">
+                <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.22em] text-slate-100">
+                  {centerLabel}
+                </span>
+              </div>
+              <div className="relative flex items-center justify-center">
+                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border border-slate-700 bg-slate-900/90 flex items-center justify-center overflow-hidden shadow-[0_0_26px_rgba(15,23,42,0.9)]">
+                  {winnerArt ? (
+                    <img
+                      src={winnerArt.win ?? winnerArt.src}
+                      alt={winnerArt.alt}
+                      className="h-full w-full object-cover"
+                      draggable={false}
+                    />
+                  ) : isDraw ? (
+                    <span className="text-xl sm:text-2xl font-semibold text-slate-200">
+                      =
+                    </span>
+                  ) : (
+                    <span className="text-xs sm:text-sm text-slate-400">
+                      Waiting…
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
-          <DuelSide
+          <SideChoice
             label="Enemy"
             symbol={enemy}
-            highlight={enemyWins}
-            faded={!!outcome && !enemyWins && !draw}
-            alignment="right"
+            outcome={outcome}
+            side="ENEMY"
             thinking={thinking && !enemy && !!player}
             progress={progress}
-            outcome={outcome}
           />
         </div>
 
@@ -78,16 +102,16 @@ export default function BattleDuel({
           <p className="text-xs sm:text-sm text-slate-300 leading-snug">
             {narration ||
               (outcome === "PLAYER" &&
-                "Like a perfect roll at the D&D table, your play cuts through the dark of Hawkins.") ||
+                "Your play cuts through the flicker of Hawkins and pushes the dark back for one more round.") ||
               (outcome === "ENEMY" &&
-                "The neon dips and the air chills as the enemy’s move echoes from the Upside Down.") ||
+                "The lights dip and the air chills as the Upside Down steals this round.") ||
               (outcome === "DRAW" &&
-                "Christmas lights tremble along the walls, but neither side breaks the tension.") ||
+                "The board hums, but neither side breaks through the neon stalemate.") ||
               (!player && !enemy &&
-                "Pick your Stranger Things symbol and let the board decide if you are with the kids or the monsters.") ||
+                "Pick your symbol to let Hawkins decide if the kids or the monsters take control.") ||
               (player && !enemy &&
-                "Your card is set. Somewhere beyond the veil, the Demogorgon smiles or shivers.") ||
-              "For a moment, Hawkins holds its breath, waiting for the next clash."}
+                "Your card is locked. The enemy is reading the currents from the other side.") ||
+              "Hawkins holds its breath, waiting for the next move."}
           </p>
         </div>
       </div>
@@ -95,100 +119,66 @@ export default function BattleDuel({
   );
 }
 
-type DuelSideProps = {
-  label: string;
+type SideChoiceProps = {
+  label: "You" | "Enemy";
   symbol: HawkinsSymbol | null;
-  highlight: boolean;
-  faded: boolean;
-  alignment: "left" | "right";
+  outcome: Outcome;
+  side: "PLAYER" | "ENEMY";
   thinking?: boolean;
   progress?: number;
-  outcome: Outcome;
 };
 
-function DuelSide({
+function SideChoice({
   label,
   symbol,
-  highlight,
-  faded,
-  alignment,
+  outcome,
+  side,
   thinking = false,
   progress = 0,
-  outcome,
-}: DuelSideProps) {
+}: SideChoiceProps) {
   const art = symbol ? ART[symbol] : null;
-
-  const containerHighlight = highlight
-    ? "border-rose-500/80 shadow-[0_0_28px_rgba(248,113,113,0.9)]"
-    : "border-slate-700";
-  const containerFade = faded ? "opacity-40" : "";
-  const justify =
-    alignment === "left"
-      ? "items-start text-left"
-      : "items-end text-right";
-
-  const displayLabel =
-    symbol ??
-    (label === "You"
-      ? ("No card yet" as HawkinsSymbol | string)
-      : ("Hidden" as HawkinsSymbol | string));
 
   let imageSrc: string | undefined = art?.src;
   if (art && symbol && outcome) {
-    if (label === "You") {
-      if (outcome === "PLAYER") imageSrc = art.win;
-      else if (outcome === "ENEMY") imageSrc = art.lose;
-    } else if (label === "Enemy") {
-      if (outcome === "ENEMY") imageSrc = art.win;
-      else if (outcome === "PLAYER") imageSrc = art.lose;
+    if (side === "PLAYER") {
+      if (outcome === "PLAYER") imageSrc = art.win ?? art.src;
+      else if (outcome === "ENEMY") imageSrc = art.lose ?? art.src;
+    } else if (side === "ENEMY") {
+      if (outcome === "ENEMY") imageSrc = art.win ?? art.src;
+      else if (outcome === "PLAYER") imageSrc = art.lose ?? art.src;
     }
   }
 
+  const hasSymbol = !!symbol;
+
   return (
-    <div
-      className={`flex flex-1 flex-col ${justify} rounded-2xl border bg-slate-950/70 px-3 py-3 sm:px-4 sm:py-4 ${containerHighlight} ${containerFade}`}
-    >
-      <div className="text-[0.7rem] uppercase tracking-[0.25em] text-slate-400">
+    <div className="flex flex-col items-center gap-2 w-24 sm:w-28">
+      <span className="text-[0.65rem] uppercase tracking-[0.22em] text-slate-400">
         {label}
-      </div>
-
-      <div className="mt-1 mb-2 min-h-[1.7rem]">
-        <div className="inline-flex flex-col items-start gap-0.5">
-          <span className="text-sm sm:text-base font-semibold uppercase tracking-[0.14em]">
-            {displayLabel}
-          </span>
-          {highlight && (
-            <span className="text-[0.65rem] text-rose-300/90 uppercase tracking-[0.18em]">
-              Advantage
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center w-full">
-        {imageSrc ? (
-          <div className="relative w-full max-w-[130px] sm:max-w-[150px] md:max-w-[170px] aspect-[4/5] overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-900/80">
-            <img
-              src={imageSrc}
-              alt={art?.alt ?? ""}
-              className="h-full w-full object-contain"
-              draggable={false}
-            />
-          </div>
+      </span>
+      <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl border border-slate-700 bg-slate-900/80 flex items-center justify-center overflow-hidden">
+        {hasSymbol && imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={art?.alt ?? ""}
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
         ) : (
-          <div className="flex h-[150px] w-full max-w-[160px] items-center justify-center rounded-2xl border border-dashed border-slate-700/80 bg-slate-900/60">
-            <span className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-slate-300 text-center px-2">
-              {label === "You" ? "Pick a card" : "Enemy will reveal"}
-            </span>
-          </div>
+          <span className="text-[0.65rem] text-slate-500 text-center px-1">
+            {label === "You" ? "Pick" : "Hidden"}
+          </span>
         )}
       </div>
+      <span className="text-[0.7rem] text-slate-300 min-h-[1.2rem] text-center">
+        {hasSymbol ? symbol : ""}
+      </span>
 
       {label === "Enemy" && (
-        <div className="mt-2 w-full min-h-[1.5rem]">
+        <div className="w-full min-h-[1.1rem]">
           {thinking && !symbol ? (
             <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-end gap-2 text-[0.7rem] text-slate-400">
+              <div className="flex items-center justify-center gap-1 text-[0.65rem] text-slate-400">
                 <span>Thinking</span>
                 <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400/90" />
               </div>
@@ -202,8 +192,8 @@ function DuelSide({
               </div>
             </div>
           ) : (
-            <div className="text-[0.7rem] text-slate-500 text-right">
-              {symbol ? "Move locked" : ""}
+            <div className="text-[0.65rem] text-slate-500 text-center">
+              {hasSymbol ? "Locked" : ""}
             </div>
           )}
         </div>

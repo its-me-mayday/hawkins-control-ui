@@ -1,15 +1,25 @@
 import { UI_ART } from "../assets/art";
 
 type Result = "PLAYER" | "ENEMY" | "DRAW" | null;
+type HeroId = "DUSTIN" | "HOPPER" | "MIKE";
 
 type Props = {
   open: boolean;
   winnerText: string | null;
   result: Result;
+  heroId?: HeroId;
+  heroName?: string;
   onNewMatch: () => void;
 };
 
-export default function EndOverlay({ open, winnerText, result, onNewMatch }: Props) {
+export default function EndOverlay({
+  open,
+  winnerText,
+  result,
+  heroId,
+  heroName,
+  onNewMatch,
+}: Props) {
   if (!open) return null;
 
   const isPlayerWin = result === "PLAYER";
@@ -33,7 +43,7 @@ export default function EndOverlay({ open, winnerText, result, onNewMatch }: Pro
     ? "Upside Down surge"
     : "Neon stalemate";
 
-  const subtitle =
+  const baseSubtitle =
     winnerText ||
     (isPlayerWin &&
       "For tonight, the kids and Hawkins keep the dark one step away.") ||
@@ -42,6 +52,30 @@ export default function EndOverlay({ open, winnerText, result, onNewMatch }: Pro
     (isDraw &&
       "The board stops just short of breaking. Hawkins breathes, but the dark is still there.") ||
     "The experiment ends, but Hawkins never really sleeps.";
+
+  let heroLine = "";
+
+  if (isPlayerWin && heroId && heroName) {
+    if (heroId === "DUSTIN") {
+      heroLine = ` ${heroName} holds the line with quick math, bad jokes, and perfectly timed plays.`;
+    } else if (heroId === "HOPPER") {
+      heroLine = ` ${heroName} grinds through the noise and keeps Hawkins standing on sheer stubborn will.`;
+    } else if (heroId === "MIKE") {
+      heroLine = ` ${heroName} keeps the party together long enough to flip the board in your favor.`;
+    }
+  } else if (isEnemyWin && heroId && heroName) {
+    if (heroId === "DUSTIN") {
+      heroLine = ` Even with ${heroName}'s plans, the board tilts toward the Upside Down tonight.`;
+    } else if (heroId === "HOPPER") {
+      heroLine = ` Not even ${heroName}'s temper and badge can fully keep the dark out this time.`;
+    } else if (heroId === "MIKE") {
+      heroLine = ` The party follows ${heroName}, but tonight Hawkins slips a little closer to the other side.`;
+    }
+  } else if (isDraw && heroName) {
+    heroLine = ` ${heroName} buys you time, but the next match will decide which side the town wakes up on.`;
+  }
+
+  const subtitle = `${baseSubtitle}${heroLine}`;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center px-4 sm:px-6">
