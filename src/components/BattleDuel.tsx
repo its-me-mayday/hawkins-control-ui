@@ -185,7 +185,7 @@ function DuelSide({
       </div>
 
       {label === "Enemy" && (
-        <div className="mt-2 w-full min-h-[1.5rem]">
+        <div className="mt-2 w-full min-h-6">
           {thinking && !symbol ? (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-end gap-2 text-[0.7rem] text-slate-400">

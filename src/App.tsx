@@ -132,48 +132,48 @@ export default function App() {
     <div className="relative min-h-screen bg-slate-950 text-slate-50">
       <div className="absolute inset-0 pointer-events-none opacity-[0.18] bg-[radial-gradient(circle_at_top,_#f97316_0,_transparent_55%),radial-gradient(circle_at_bottom,_#22d3ee_0,_transparent_55%)]" />
       <div className="relative flex min-h-screen flex-col">
-        <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex flex-col gap-0.5">
-              <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase">
-                Hawkins Control
-              </h1>
-              <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
-                Season 1 · First to {targetWins} wins
-              </p>
-            </div>
+      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+  <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3">
+    <div className="flex flex-col gap-0.5">
+      <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase">
+        Hawkins Control
+      </h1>
+      <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
+        Season 1 · First to {targetWins} wins
+      </p>
+    </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <IconButton
-                label="Open stats"
-                onClick={() => setStatsOpen(true)}
-                className="w-9 h-9 md:w-10 md:h-10"
-                title="Stats"
-              >
-                <img
-                  src={UI_ART.STATS.src}
-                  alt={UI_ART.STATS.alt}
-                  className="w-5 h-5 md:w-6 md:h-6"
-                  draggable={false}
-                />
-              </IconButton>
+    <div className="flex items-center gap-2 sm:gap-3">
+      <IconButton
+        label="Open stats"
+        onClick={() => setStatsOpen(true)}
+        title="Stats"
+        className="relative w-9 h-9 md:w-10 md:h-10 rounded-full border border-rose-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(248,113,113,0.7)] hover:border-rose-400 hover:shadow-[0_0_22px_rgba(248,113,113,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      >
+        <img
+          src={UI_ART.STATS.src}
+          alt={UI_ART.STATS.alt}
+          className="w-5 h-5 md:w-6 md:h-6"
+          draggable={false}
+        />
+      </IconButton>
 
-              <IconButton
-                label="Open settings"
-                onClick={() => setSettingsOpen(true)}
-                className="w-9 h-9 md:w-10 md:h-10"
-                title="Settings"
-              >
-                <img
-                  src={UI_ART.GEAR.src}
-                  alt={UI_ART.GEAR.alt}
-                  className="w-5 h-5 md:w-6 md:h-6"
-                  draggable={false}
-                />
-              </IconButton>
-            </div>
-          </div>
-        </header>
+      <IconButton
+        label="Open settings"
+        onClick={() => setSettingsOpen(true)}
+        title="Settings"
+        className="relative w-9 h-9 md:w-10 md:h-10 rounded-full border border-sky-500/70 bg-slate-950/90 shadow-[0_0_16px_rgba(56,189,248,0.7)] hover:border-sky-400 hover:shadow-[0_0_22px_rgba(56,189,248,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      >
+        <img
+          src={UI_ART.GEAR.src}
+          alt={UI_ART.GEAR.alt}
+          className="w-5 h-5 md:w-6 md:h-6"
+          draggable={false}
+        />
+      </IconButton>
+    </div>
+  </div>
+</header>
 
         <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex justify-center">

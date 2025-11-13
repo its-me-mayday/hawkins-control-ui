@@ -1,49 +1,52 @@
-import React from "react";
+import type { ReactNode } from "react";
 
-type AreaVariant = "player" | "enemy" | "battle";
-type AreaProps = {
-  variant?: AreaVariant;
-  title?: string;
+type Props = {
+  variant: "player" | "battle";
+  title: string;
   subtitle?: string;
-  headerAlign?: "left" | "center" | "right";
   className?: string;
-  children: React.ReactNode;
-  accent?: string;
-};
-
-const VARIANT_ACCENT: Record<AreaVariant, string> = {
-  player: "var(--hawkins-red)",
-  enemy: "var(--hawkins-cyan)",
-  battle: "var(--hawkins-magenta)",
+  children: ReactNode;
 };
 
 export default function GameArea({
-  variant = "player",
+  variant,
   title,
   subtitle,
-  headerAlign = "center",
   className,
   children,
-  accent,
-}: AreaProps) {
-  const accentValue = accent ?? VARIANT_ACCENT[variant];
+}: Props) {
+  const isPlayer = variant === "player";
+
+  const accentRing = isPlayer
+    ? "border-rose-500/40 shadow-[0_0_26px_rgba(248,113,113,0.55)]"
+    : "border-sky-500/40 shadow-[0_0_26px_rgba(56,189,248,0.55)]";
+
   return (
-    <section className={["hk-panel", className].filter(Boolean).join(" ")} style={{ ["--accent" as any]: accentValue }}>
-      {(title || subtitle) && (
-        <header
-          className={[
-            "p-3",
-            "mb-4",
-            headerAlign === "left" && "text-left",
-            headerAlign === "center" && "text-center",
-            headerAlign === "right" && "text-right",
-          ].filter(Boolean).join(" ")}
-        >
-          {title && <h2 className="hk-title text-base text-(--accent)">{title}</h2>}
-          {subtitle && <p className="mt-1 text-xs text-(--hawkins-muted) uppercase tracking-widest">{subtitle}</p>}
-        </header>
-      )}
-      <div>{children}</div>
+    <section
+      className={`rounded-2xl border bg-slate-950/80 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-sm ${accentRing} ${className ?? ""}`}
+    >
+      <header className="mb-2 flex items-baseline justify-between gap-2">
+        <div>
+          <h2 className="text-sm sm:text-base font-semibold tracking-[0.22em] uppercase text-slate-100">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="mt-0.5 text-[0.7rem] sm:text-xs text-slate-400 tracking-[0.12em] uppercase">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        <div className="hidden sm:flex items-center gap-1 text-[0.65rem] uppercase tracking-[0.18em] text-slate-500">
+          <span className={isPlayer ? "text-rose-300/90" : "text-sky-300/90"}>
+            {isPlayer ? "Selection" : "Resolution"}
+          </span>
+          <span className="text-slate-600">·</span>
+          <span>Hawkins Control</span>
+        </div>
+      </header>
+
+      <div className="mt-1">{children}</div>
     </section>
   );
 }
