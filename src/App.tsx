@@ -11,10 +11,11 @@ import BattleDuel from "./components/BattleDuel";
 import StartOverlay from "./components/StartOverlay";
 import EndOverlay from "./components/EndOverlay";
 import StatsDialog from "./components/StatsDialog";
-import { useEffect, useMemo, useState, type SetStateAction } from "react";
+import MatchBadge from "./components/MatchBadge";
+import StartScreen from "./components/StartScreen";
+import { useEffect, useMemo, useState } from "react";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
-import MatchBadge from "./components/MatchBadge";
 
 const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
 
@@ -27,7 +28,7 @@ function readAudioSettings() {
   } catch {}
   return null;
 }
-function writeAudioSettings(s: { schemaVersion: number; musicOn: boolean; sfxOn: boolean; musicVolume: number; }) {
+function writeAudioSettings(s: any) {
   try { localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s)); } catch {}
 }
 
@@ -48,6 +49,8 @@ export default function App() {
     },
     actions: { setTargetWins, onPick, resetMatch },
   } = useGameController();
+
+  const [showHome, setShowHome] = useState(true);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -84,7 +87,7 @@ export default function App() {
     return "";
   }, [lastRound?.outcome]);
 
-  const startMatch = (rounds: SetStateAction<number>) => {
+  const startMatch = (rounds: number) => {
     if (musicOn) ambience.arm();
     if (sfxOn) synth.arm();
     resetMatch();
@@ -105,44 +108,40 @@ export default function App() {
     else synth.draw();
   }, [lastRound?.outcome, sfxOn]);
 
+  if (showHome) {
+    return <StartScreen onEnter={() => setShowHome(false)} logoSrc={UI_ART.ICON.src} />;
+  }
+
+
   return (
-<main className="min-h-screen px-4 sm:px-8 py-6 sm:py-8 space-y-5 sm:space-y-6">
-      <div className="mb-2">
-        <nav className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <MatchBadge player={match.player} enemy={match.enemy} targetWins={targetWins} />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <IconButton
-              label="Open stats"
-              onClick={() => setStatsOpen(true)}
-              className="w-9 h-9 md:w-10 md:h-10"
-              title="Stats"
-            >
-              <img src={UI_ART.STATS.src} alt={UI_ART.STATS.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
-            </IconButton>
-            <IconButton
-              label="Open settings"
-              onClick={() => setSettingsOpen(true)}
-              className="w-9 h-9 md:w-10 md:h-10"
-              title="Settings"
-            >
-              <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
-            </IconButton>
-          </div>
-        </nav>
-      </div>
+    <main className="min-h-screen px-4 sm:px-6 lg:px-10 py-5 sm:py-6 space-y-5">
+      <nav className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <MatchBadge player={match.player} enemy={match.enemy} targetWins={targetWins} />
+        </div>
 
-      <header className="text-center mb-6 sm:mb-8 relative pr-24 sm:pr-36">
-      <h1 className="hk-title animate-hk-flash" style={{fontSize: "var(--hk-title-size)"}}>
-  Hawkins Control
-</h1>
-<p className="text-(--hawkins-muted) mt-1 sm:mt-2" style={{fontSize:"var(--hk-sub-size)"}}>
-  Eleven vs Demogorgon vs Hawkins Lab
-</p>
-      </header>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <IconButton
+            label="Open stats"
+            onClick={() => setStatsOpen(true)}
+            className="w-9 h-9 md:w-10 md:h-10"
+            title="Stats"
+          >
+            <img src={UI_ART.STATS.src} alt={UI_ART.STATS.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
+          </IconButton>
 
-      {/* Dialog centrati */}
+          <IconButton
+            label="Open settings"
+            onClick={() => setSettingsOpen(true)}
+            className="w-9 h-9 md:w-10 md:h-10"
+            title="Settings"
+          >
+            <img src={UI_ART.GEAR.src} alt={UI_ART.GEAR.alt} className="w-5 h-5 md:w-6 md:h-6" draggable={false} />
+          </IconButton>
+        </div>
+      </nav>
+
+      {/* Dialogs (centrati) */}
       <SettingsDialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
@@ -153,6 +152,7 @@ export default function App() {
         onToggleSfx={(v) => { setSfxOn(v); if (v) synth.arm(); }}
         onChangeMusicVolume={(v) => setMusicVolume(v)}
       />
+
       <StatsDialog
         open={statsOpen}
         onClose={() => setStatsOpen(false)}
@@ -163,8 +163,9 @@ export default function App() {
         enemyScore={match.enemy}
       />
 
-<div className="grid lg:grid-cols-1 items-start">
-<div className="space-y-5 sm:space-y-6 min-w-0">
+      {/* Layout contenuti */}
+      <div className="grid lg:grid-cols-1 items-start">
+        <div className="space-y-6 min-w-0">
           <div className={playerFolded ? "hk-fold hk-fold--collapsed" : "hk-fold hk-fold--open"}>
             <GameArea variant="player" title="Player" subtitle={started ? "Choose your side" : "Start the match"}>
               <div className="relative">
