@@ -17,11 +17,15 @@ import icon from "./icon.png";
 import stats from "./stats.png";
 import hawkins from "./hawkins.png";
 import hawkinsUpside from "./hawkins-upside.png";
+import home from "./hawkins.png";
+import rematch from "./rematch.png";
 
 export const UI_ART = { 
   GEAR: { src: gear, alt: "Settings" },
   ICON: { src: icon, alt: "Icon" },
   STATS: { src: stats, alt: "Stats" },
+  HOME: { src: home, alt: "Home" },
+  REMATCH: { src: rematch, alt: "Rematch" },
   HAWKINS: { src: hawkins, alt: "Hawkins, Indiana" },
   HAWKINS_UPSIDE: { src: hawkinsUpside, alt: "Hawkins, The Upside Down" },
  };

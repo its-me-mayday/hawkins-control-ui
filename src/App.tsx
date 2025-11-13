@@ -1,14 +1,33 @@
 import "./index.css";
-import { UI_ART, HEROES } from "./assets/art";
-import StartScreen from "./components/StartScreen";
-import { useGameController } from "./hooks/useGameController";
 import { useEffect, useMemo, useState } from "react";
+import StartScreen from "./components/StartScreen";
+import { HEROES, UI_ART } from "./assets/art";
+import { HERO_META, type HeroKey } from "./constants/heroes";
+import { useGameController } from "./hooks/useGameController";
 import { useSynth } from "./hooks/useSynth";
 import { useAmbience } from "./hooks/useAmbience";
-import { HERO_META, type HeroKey } from "./constants/heroes";
-import { readAudioSettings, writeAudioSettings } from "./utils/audioSettings";
 import AppHeader from "./layout/AppHeader";
 import GameScreen from "./layout/GameScreen";
+
+const STORAGE_SETTINGS_KEY = "hawkins-control:audio";
+
+function readAudioSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.schemaVersion === 1 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeAudioSettings(s: unknown) {
+  try {
+    localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(s));
+  } catch {
+  }
+}
 
 export default function App() {
   const {
@@ -29,7 +48,6 @@ export default function App() {
   } = useGameController();
 
   const [showHome, setShowHome] = useState(true);
-
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [started, setStarted] = useState(false);
@@ -50,20 +68,17 @@ export default function App() {
   }, [ambience]);
 
   useEffect(() => {
-    const settings = readAudioSettings();
-    if (!settings) return;
-    setMusicOn(settings.musicOn);
-    setSfxOn(settings.sfxOn);
-    setMusicVolume(settings.musicVolume);
+    const s = readAudioSettings();
+    if (!s) return;
+    setMusicOn(!!(s as any).musicOn);
+    setSfxOn(!!(s as any).sfxOn);
+    setMusicVolume(
+      typeof (s as any).musicVolume === "number" ? (s as any).musicVolume : 0.12,
+    );
   }, []);
 
   useEffect(() => {
-    writeAudioSettings({
-      schemaVersion: 1,
-      musicOn,
-      sfxOn,
-      musicVolume,
-    });
+    writeAudioSettings({ schemaVersion: 1, musicOn, sfxOn, musicVolume });
   }, [musicOn, sfxOn, musicVolume]);
 
   useEffect(() => {
@@ -101,7 +116,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (started && !matchOver && !playerChoice && !enemyChoice) setBattleShown(false);
+    if (started && !matchOver && !playerChoice && !enemyChoice) {
+      setBattleShown(false);
+    }
   }, [started, matchOver, playerChoice, enemyChoice]);
 
   useEffect(() => {
@@ -123,6 +140,31 @@ export default function App() {
       : match.player < match.enemy
       ? "ENEMY"
       : "DRAW";
+
+  const handleSelectCard = (symbol: any) => {
+    if (!battleShown) setBattleShown(true);
+    if (sfxOn) {
+      try {
+        synth.arm();
+      } catch {
+      }
+      synth.select();
+    }
+    onPick(symbol);
+  };
+
+  const handleNewMatch = () => {
+    resetMatch();
+    setStarted(false);
+    setBattleShown(false);
+  };
+
+  const handleGoHome = () => {
+    resetMatch();
+    setStarted(false);
+    setBattleShown(false);
+    setShowHome(true);
+  };
 
   if (showHome) {
     return (
@@ -146,6 +188,8 @@ export default function App() {
           heroJustChanged={heroJustChanged}
           onOpenStats={() => setStatsOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
+          onGoHome={handleGoHome}
+          onNewMatch={handleNewMatch}
         />
 
         <GameScreen
@@ -159,15 +203,15 @@ export default function App() {
           musicOn={musicOn}
           sfxOn={sfxOn}
           musicVolume={musicVolume}
-          onToggleMusic={(value) => {
-            setMusicOn(value);
-            if (value) ambience.arm();
+          onToggleMusic={(v) => {
+            setMusicOn(v);
+            if (v) ambience.arm();
           }}
-          onToggleSfx={(value) => {
-            setSfxOn(value);
-            if (value) synth.arm();
+          onToggleSfx={(v) => {
+            setSfxOn(v);
+            if (v) synth.arm();
           }}
-          onChangeMusicVolume={(value) => setMusicVolume(value)}
+          onChangeMusicVolume={(v) => setMusicVolume(v)}
           wins={scoreboard.wins}
           losses={scoreboard.losses}
           draws={scoreboard.draws}
@@ -178,21 +222,12 @@ export default function App() {
           battleAnim={battleAnim}
           playerChoice={playerChoice}
           enemyChoice={enemyChoice}
-          lastOutcome={lastRound?.outcome}
-          lastNarration={lastRound?.narration}
+          lastOutcome={lastRound?.outcome ?? null}
+          lastNarration={lastRound?.narration ?? null}
           awaitNextRound={awaitNextRound}
           enemyThinking={enemyThinking}
           enemyProgress={enemyProgress}
-          onSelectCard={(symbol) => {
-            if (!battleShown) setBattleShown(true);
-            if (sfxOn) {
-              try {
-                synth.arm();
-              } catch {}
-              synth.select();
-            }
-            onPick(symbol);
-          }}
+          onSelectCard={handleSelectCard}
           startOverlayOpen={!started}
           startOverlayDefaultTarget={targetWins}
           hero={hero}
@@ -203,11 +238,7 @@ export default function App() {
           matchResult={matchResult}
           heroName={heroMeta.name}
           heroId={hero}
-          onNewMatch={() => {
-            resetMatch();
-            setStarted(false);
-            setBattleShown(false);
-          }}
+          onNewMatch={handleNewMatch}
         />
       </div>
     </div>

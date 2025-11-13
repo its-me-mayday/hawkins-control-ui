@@ -11,6 +11,8 @@ type Props = {
   heroJustChanged: boolean;
   onOpenStats: () => void;
   onOpenSettings: () => void;
+  onGoHome: () => void;
+  onNewMatch: () => void;
 };
 
 export default function AppHeader({
@@ -22,10 +24,22 @@ export default function AppHeader({
   heroJustChanged,
   onOpenStats,
   onOpenSettings,
+  onGoHome,
+  onNewMatch,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const heroAccent = getHeroAccent(heroId);
   const burgerHeroClass = getHeroBurgerClass(heroId);
+
+  const handleGoHome = () => {
+    onGoHome();
+    setMenuOpen(false);
+  };
+
+  const handleNewMatch = () => {
+    onNewMatch();
+    setMenuOpen(false);
+  };
 
   const handleOpenStats = () => {
     onOpenStats();
@@ -38,7 +52,7 @@ export default function AppHeader({
   };
 
   return (
-    <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <header className="relative z-30 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center gap-4 min-w-0">
           <div className="flex flex-col gap-0.5">
@@ -104,7 +118,7 @@ export default function AppHeader({
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-11 z-20 w-52 rounded-2xl border border-slate-800 bg-slate-950/98 shadow-[0_12px_40px_rgba(15,23,42,0.9)] py-2">
+            <div className="absolute right-0 top-11 z-50 w-56 rounded-2xl border border-slate-800 bg-slate-950/98 shadow-[0_12px_40px_rgba(15,23,42,0.9)] py-2">
               <div className="flex items-center gap-2 px-3 pb-2 border-b border-slate-800">
                 <div className="h-7 w-7 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
                   <img
@@ -126,6 +140,34 @@ export default function AppHeader({
 
               <button
                 type="button"
+                onClick={handleGoHome}
+                className="flex w-full items-center justify-between px-3 py-2 text-[0.8rem] text-slate-100 hover:bg-slate-900"
+              >
+                <span>Home</span>
+                <img
+                  src={UI_ART.HOME.src}
+                  alt={UI_ART.HOME.alt}
+                  className="h-4 w-4"
+                  draggable={false}
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNewMatch}
+                className="flex w-full items-center justify-between px-3 py-2 text-[0.8rem] text-slate-100 hover:bg-slate-900"
+              >
+                <span>New match</span>
+                <img
+                  src={UI_ART.REMATCH.src}
+                  alt={UI_ART.REMATCH.alt}
+                  className="h-4 w-4"
+                  draggable={false}
+                />
+              </button>
+
+              <button
+                type="button"
                 onClick={handleOpenStats}
                 className="flex w-full items-center justify-between px-3 py-2 text-[0.8rem] text-slate-100 hover:bg-slate-900"
               >
@@ -137,6 +179,7 @@ export default function AppHeader({
                   draggable={false}
                 />
               </button>
+
               <button
                 type="button"
                 onClick={handleOpenSettings}
