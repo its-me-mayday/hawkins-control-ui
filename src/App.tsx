@@ -139,6 +139,7 @@ export default function App() {
       <div className="relative flex min-h-screen flex-col">
         <AppHeader
           targetWins={targetWins}
+          heroId={hero}
           heroName={heroMeta.name}
           heroAvatarSrc={heroArt.src}
           heroAvatarAlt={heroArt.alt}

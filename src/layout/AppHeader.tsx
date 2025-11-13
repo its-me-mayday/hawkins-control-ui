@@ -1,8 +1,10 @@
 import IconButton from "../components/IconButton";
 import { UI_ART } from "../assets/art";
+import type { HeroKey } from "../constants/heroes";
 
 type Props = {
   targetWins: number;
+  heroId: HeroKey;
   heroName: string;
   heroAvatarSrc: string;
   heroAvatarAlt: string;
@@ -13,6 +15,7 @@ type Props = {
 
 export default function AppHeader({
   targetWins,
+  heroId,
   heroName,
   heroAvatarSrc,
   heroAvatarAlt,
@@ -20,6 +23,8 @@ export default function AppHeader({
   onOpenStats,
   onOpenSettings,
 }: Props) {
+  const isJoyce = heroId === "JOYCE";
+
   return (
     <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 py-3">
@@ -28,9 +33,22 @@ export default function AppHeader({
             <h1 className="text-lg sm:text-xl font-semibold tracking-[0.3em] uppercase truncate">
               Hawkins Control
             </h1>
-            <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
-              Season 1 · First to {targetWins} wins
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="hidden text-[0.7rem] uppercase tracking-[0.2em] text-slate-400 sm:block">
+                Season 1 · First to {targetWins} wins
+              </p>
+              {isJoyce && (
+                <div className="hidden sm:inline-flex items-center">
+                  <div className="hk-joyce-lights">
+                    <span className="hk-joyce-bulb hk-joyce-bulb--red" />
+                    <span className="hk-joyce-bulb hk-joyce-bulb--yellow" />
+                    <span className="hk-joyce-bulb hk-joyce-bulb--blue" />
+                    <span className="hk-joyce-bulb hk-joyce-bulb--green" />
+                    <span className="hk-joyce-bulb hk-joyce-bulb--pink" />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div
