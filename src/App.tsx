@@ -281,12 +281,6 @@ export default function App() {
                   }
                   className={battleAnim}
                 >
-                  <ControlsBar
-                    targetWins={targetWins}
-                    disabledSelect={true}
-                    onChangeTarget={setTargetWins}
-                    showTarget={false}
-                  />
                   <BattleDuel
                     player={started ? playerChoice : null}
                     enemy={started ? enemyChoice : null}
