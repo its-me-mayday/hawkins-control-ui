@@ -1,5 +1,4 @@
 # Hawkins Control
-
 A neon‑soaked, Stranger‑Things‑flavored **card duel** built with React + Tailwind.  
 Pick your side (Eleven, Demogorgon, or Hawkins Lab), watch the enemy “think,” and race to the target number of wins.  
 It’s a tiny arcade you can play in the browser, structured with a clean separation between **engine** (model/controller in `@its-me-mayday/hawkins-control`) and **view** (this React app).
